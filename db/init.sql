@@ -22,8 +22,10 @@ CREATE TABLE IF NOT EXISTS executions (
 
     finish_at TIMESTAMPTZ,
 
+    executed_nodes TEXT[] NOT NULL DEFAULT '{}',
+
     current_state TEXT NOT NULL
-    
+
 );
 
 CREATE OR REPLACE FUNCTION set_updated_at()

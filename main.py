@@ -10,12 +10,14 @@ execution_manager = ExecutionManager()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    execution_db = DbHandlerExecution()
+    execution_db.reset() # any execution object remained in DB from the previous app run are removed 
+
     await execution_manager.start()
 
     yield
 
     await execution_manager.stop()
-
 
 app = FastAPI(
     title="Asset Workflow Backend",
@@ -37,7 +39,7 @@ async def health():
     }
 
 # --------------------------------------------------------------------
-# Future API Endpoints
+# interface for handling workflow objects
 # --------------------------------------------------------------------
 
 @app.post("/workflows")
@@ -103,7 +105,9 @@ async def delete_workflow(workflow_id: str):
     return Response(status_code=204)
 
 
-## ----------------------------------------------------------------------
+# --------------------------------------------------------------------
+# interface for handling execution objects
+# --------------------------------------------------------------------
 
 @app.get("/execution")
 async def get_all_executions():
@@ -116,9 +120,8 @@ async def execution_request(request: ExecRequestInput):
     schedule_db = DbHandlerExecution()
     workflow_db = DbHandlerWorkflow()
 
-    workflow_id = request.workflow_id
-    
-    # reject if the workflow does not exist
+    # reject if the workflow_id does not exist
+    workflow_id = request.workflow_id 
     workflow = workflow_db.get_workflow(workflow_id)
     if workflow is None:
         raise HTTPException(
@@ -126,6 +129,7 @@ async def execution_request(request: ExecRequestInput):
             detail="Workflow not found",
         )
     
+    # push the execution object into the db table
     result = schedule_db.insert_execution(workflow_id)
 
     return {

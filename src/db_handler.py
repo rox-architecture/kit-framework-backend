@@ -1,5 +1,6 @@
 from psycopg_pool import ConnectionPool
 from psycopg.types.json import Jsonb
+from datetime import datetime, UTC
 
 pool = ConnectionPool(
     conninfo=(
@@ -270,16 +271,47 @@ class DbHandlerExecution():
             for row in rows
         ]
 
-    def cancel_execution(self, reference_id: str):
+    def execution_cancelled(self, reference_id: str):
         with pool.connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(
                     """
-                    DELETE FROM schedule
+                    UPDATE executions
+                    SET
+                        finish_at = %s,
+                        current_state = 'CANCELLED'
                     WHERE reference_id = %s
                     RETURNING reference_id;
                     """,
-                    (reference_id,),
+                    (
+                        datetime.now(UTC),
+                        reference_id,
+                    ),
+                )
+
+                row = cur.fetchone()
+
+            conn.commit()
+
+        return row is not None
+       
+
+    def execution_started(self, reference_id: str):
+        with pool.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    UPDATE executions
+                    SET
+                        start_at = %s,
+                        current_state = 'RUNNING'
+                    WHERE reference_id = %s
+                    RETURNING reference_id;
+                    """,
+                    (
+                        datetime.now(UTC),
+                        reference_id,
+                    ),
                 )
 
                 row = cur.fetchone()
@@ -288,13 +320,59 @@ class DbHandlerExecution():
 
         return row is not None
 
-    def set_start_execution(self, reference_id: str):
-        pass
+    def execution_finished(self, reference_id: str):
+        with pool.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    UPDATE executions
+                    SET
+                        finish_at = %s,
+                        current_state = 'FINISHED'
+                    WHERE reference_id = %s
+                    RETURNING reference_id;
+                    """,
+                    (
+                        datetime.now(UTC),
+                        reference_id,
+                    ),
+                )
+                row = cur.fetchone()
 
-class DbHandlerHistory():
+            conn.commit()
 
-    def insert_history_item(self, workflow_id):
-        pass
+        return row is not None
 
-    def get_all_history_items(self):
-        pass
+    def execution_failed(self, reference_id: str):
+        with pool.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    UPDATE executions
+                    SET
+                        finish_at = %s,
+                        current_state = 'FAILED'
+                    WHERE reference_id = %s
+                    RETURNING reference_id;
+                    """,
+                    (
+                        datetime.now(UTC),
+                        reference_id,
+                    ),
+                )
+                row = cur.fetchone()
+
+            conn.commit()
+
+        return row is not None
+
+    def reset(self):
+        with pool.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    TRUNCATE TABLE executions;
+                    """
+                )
+
+            conn.commit()

@@ -40,29 +40,32 @@ class ExecutionManager:
     # TODO: this part is where the workflow is executed by the worker
     async def run_worker(self, reference_id: str, workflow: dict):
         execution_db = DbHandlerExecution()
+
+        graph = workflow['graph_json']
+        sequence = workflow['execution_flow']
         
         try:
             print(f"[Worker] Start workflow {reference_id}")
-            current_time = datetime.now()
-            execution_db.set_start_execution(current_time, 'RUNNING')
+            execution_db.execution_started(reference_id)
 
-            while self._running:
-                print(f"[Worker] Running workflow {reference_id}")
-                await asyncio.sleep(1)
-                break
+            await asyncio.sleep(10)
 
         except asyncio.CancelledError:
             print(f"[Worker] Cancelled workflow {reference_id}")
+            execution_db.execution_cancelled(reference_id)
             raise
 
         except Exception as e:
             print(f"[Worker] Failed workflow {reference_id}: {e}")
+            execution_db.execution_failed(reference_id)
+
 
         finally:
             print(f"[Worker] Finished workflow {reference_id}")
+            execution_db.execution_finished(reference_id)
 
 
-    # This is thie main loop of the execution manager
+    # This is the main loop of the execution manager
     # The schedule db is monitored 
     async def run(self):
         try:
@@ -76,6 +79,7 @@ class ExecutionManager:
                 # get all the PENDING execution items
                 execution_items = execution_db.get_executions_by_status("PENDING")
                 
+                # for each PENDING execution, assign a worker
                 for item in execution_items:
                     workflow_id = item['workflow_id']
                     workflow = workflow_db.get_workflow(workflow_id)
@@ -83,9 +87,8 @@ class ExecutionManager:
                     # we keep tracking of the workers
                     self._running_tasks[workflow_id] = asyncio.create_task(self.run_worker(reference_id, workflow))
                
-                print(f"[ExecutionManager] {len(execution_items)} workflows are executed")
+                print(f"[ExecutionManager] {len(execution_items)} workflow(s) started execution")
                 await asyncio.sleep(5)
-
 
         except asyncio.CancelledError:
             print("[ExecutionManager] Cancelled")
