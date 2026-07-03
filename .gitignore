@@ -1,0 +1,7 @@
+*.pyc
+.venv
+
+react-flow-tester/**
+!react-flow-tester
+!react-flow-tester/README.md
+!react-flow-tester/App.jsx
