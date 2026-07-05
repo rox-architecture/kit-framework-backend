@@ -1,0 +1,68 @@
+{
+  "nodes": [
+    {
+      "id": "node-1783154898635",
+      "type": "custom",
+      "position": {
+        "x": -141.34877942359907,
+        "y": -30.940138396839288
+      },
+      "data": {
+        "label": "MNIST dataset",
+        "params": {
+          "adapter_type": "dlr_connector",
+          "type": "data_file"
+        },
+        "paramOrder": [
+          "adapter_type",
+          "type"
+        ],
+        "inputCount": 0,
+        "outputCount": 1
+      },
+      "measured": {
+        "width": 201,
+        "height": 162
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "node-1783160572690",
+      "type": "custom",
+      "position": {
+        "x": 167.46932741419428,
+        "y": 15.213390532286198
+      },
+      "data": {
+        "label": "Save To File",
+        "params": {
+          "scope": "utility",
+          "type": "save_to_file"
+        },
+        "paramOrder": [
+          "scope",
+          "type"
+        ],
+        "inputCount": 1,
+        "outputCount": 0
+      },
+      "measured": {
+        "width": 174,
+        "height": 162
+      },
+      "selected": true,
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "source": "node-1783154898635",
+      "sourceHandle": "output-0",
+      "target": "node-1783160572690",
+      "targetHandle": "input-0",
+      "id": "edge-1783160631426",
+      "animated": true
+    }
+  ]
+}

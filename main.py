@@ -1,12 +1,14 @@
 from fastapi import FastAPI, HTTPException, Response
 import uvicorn
-from src.graph_parser import GraphParser
+from src.sequence_generator import SequenceGenerator
 from src.db_handler import DbHandlerWorkflow, DbHandlerExecution
 from src.execution_manager import ExecutionManager
 from contextlib import asynccontextmanager
 from schema.api_schema import *
+from dotenv import load_dotenv
 
 execution_manager = ExecutionManager()
+load_dotenv()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -48,7 +50,7 @@ async def register_workflow(request: GraphInput):
     name = request.workflow_name
     
     try:
-        parser = GraphParser(graph)
+        parser = SequenceGenerator(graph)
         if not parser.check_DAG():
             raise HTTPException(
                 status_code=400,

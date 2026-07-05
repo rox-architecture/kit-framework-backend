@@ -1,7 +1,6 @@
 import networkx as nx
-from typing import Any
 
-class GraphParser:
+class SequenceGenerator:
 
     def __init__(self, graph_json):
         self.graph_json = graph_json
@@ -10,17 +9,15 @@ class GraphParser:
     def _build_graph(self) -> nx.DiGraph:
         graph = nx.DiGraph()
 
-        id_to_label = {}
-
         for node in self.graph_json.get("nodes", []):
-            label = node["data"]["label"]
-            id_to_label[node["id"]] = label
-            graph.add_node(label, **node)
+            graph.add_node(node["id"], **node)
 
         for edge in self.graph_json.get("edges", []):
-            source = id_to_label[edge["source"]]
-            target = id_to_label[edge["target"]]
-            graph.add_edge(source, target, **edge)
+            graph.add_edge(
+                edge["source"],
+                edge["target"],
+                **edge
+            )
 
         return graph
 
@@ -29,5 +26,7 @@ class GraphParser:
 
     # topological generation sort
     def generate_plan(self) -> list[list[str]]:
-        return [list(level) for level in nx.topological_generations(self.graph)]
+        # return 2d list, where each element is 1d to enable parallelisation in the future
+        # TODO: efficient DAG execution order calculation algorithm is needed: minimisation of memory footage and maximisation of the parallelisation
+        return [[level] for level in nx.topological_sort(self.graph)] 
     

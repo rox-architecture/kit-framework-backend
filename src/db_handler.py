@@ -12,7 +12,7 @@ pool = ConnectionPool(
     )
 )
 
-class DbHandlerWorkflow():
+class DbHandlerWorkflow:
     def insert_workflow(self, name:str, graph:dict, execution_flow:list):
         with pool.connection() as conn:
             with conn.cursor() as cur:
@@ -119,7 +119,7 @@ class DbHandlerWorkflow():
         ]
 
 
-class DbHandlerExecution():
+class DbHandlerExecution:
 
     def insert_execution(self, workflow_id: str):
         with pool.connection() as conn:

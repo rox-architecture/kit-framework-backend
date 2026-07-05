@@ -1,14 +1,20 @@
 import asyncio
-from src.db_handler import DbHandlerWorkflow, DbHandlerExecution
 from datetime import datetime, UTC
+
+from src.db_handler import DbHandlerWorkflow, DbHandlerExecution
+from src.node_plugins.node_registry import NODE_REGISTRY
+
 
 class ExecutionManager:
     def __init__(self):
         self._task = None
         self._running = False
+        self._running_tasks: dict[str, asyncio.Task] = {} # for the worker cancellation
 
-        # for each schedule item, we assign one async task
-        self._running_tasks: dict[str, asyncio.Task] = {}
+        self.parameters = {}
+        # later, we can add various options to the execution core
+        # E.g., "temporary_files": True | False ==> the output of all the nodes are wrapped into list(Item) and saved into a file instead of in the memory.
+        # E.g., "parallelisation": True | False ==> the execution of nodes in the same generation can be executed in parallel. Further information will be required.
 
     async def start(self):
         if self._running:
@@ -18,6 +24,7 @@ class ExecutionManager:
         print("[ExecutionManager] Started")
 
         self._task = asyncio.create_task(self.run())
+
 
     async def stop(self):
         if not self._running:
@@ -41,28 +48,49 @@ class ExecutionManager:
     async def run_worker(self, reference_id: str, workflow: dict):
         execution_db = DbHandlerExecution()
 
+        failed = False
         graph = workflow['graph_json']
         sequence = workflow['execution_flow']
         
         try:
-            print(f"[Worker] Start workflow {reference_id}")
+            print(f"[Execution {reference_id}] Start workflow")
             execution_db.execution_started(reference_id)
 
-            await asyncio.sleep(10)
+            # ----------------------------------------------------------------------
+            # Construct executable objects for every node in the graph
+            # ----------------------------------------------------------------------
+            executable_nodes = {}
+            for node in graph['nodes']:
+                node_id = node['id']
+                node_type = node['data']['params']['type']
+                node_class = NODE_REGISTRY[node_type] # select the correct node class from the registry
+                print(f"[Execution {reference_id}]", end=" ")
+                executable_nodes[node_id] = node_class(node) # instantiate the node object
+
+            # ----------------------------------------------------------------------
+            # Execute the node objects and handle their connections 
+            # ----------------------------------------------------------------------
+            for index, generation in enumerate(sequence): # iterate over the execution sequence
+                # for now, all the nodes are sequentially executed
+                for node_id in generation:
+                    node_obj = executable_nodes[node_id]
+                    input_data = {}
+                    node_obj.run(input_data)
 
         except asyncio.CancelledError:
-            print(f"[Worker] Cancelled workflow {reference_id}")
+            print(f"[Execution {reference_id}] Cancelled workflow {reference_id}")
             execution_db.execution_cancelled(reference_id)
             raise
 
         except Exception as e:
-            print(f"[Worker] Failed workflow {reference_id}: {e}")
+            print(f"[Execution {reference_id}] Failed workflow {reference_id}: {e}")
             execution_db.execution_failed(reference_id)
-
+            failed = True
 
         finally:
-            print(f"[Worker] Finished workflow {reference_id}")
-            execution_db.execution_finished(reference_id)
+            if not failed:
+                print(f"[Execution {reference_id}] Finished workflow {reference_id}")
+                execution_db.execution_finished(reference_id)
 
 
     # This is the main loop of the execution manager
@@ -85,7 +113,12 @@ class ExecutionManager:
                     workflow = workflow_db.get_workflow(workflow_id)
                     reference_id = item['reference_id']
                     # we keep tracking of the workers
-                    self._running_tasks[workflow_id] = asyncio.create_task(self.run_worker(reference_id, workflow))
+                    task = asyncio.create_task(self.run_worker(reference_id, workflow))
+                    self._running_tasks[workflow_id] = task
+
+                    task.add_done_callback(
+                        lambda _: self._running_tasks.pop(workflow_id, None)
+                    )
                
                 print(f"[ExecutionManager] {len(execution_items)} workflow(s) started execution")
                 await asyncio.sleep(5)

@@ -1,6 +1,6 @@
 *.pyc
 .venv
-
+.env
 react-flow-tester/**
 !react-flow-tester
 !react-flow-tester/README.md
