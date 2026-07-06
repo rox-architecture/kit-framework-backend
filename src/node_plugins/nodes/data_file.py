@@ -7,16 +7,16 @@ from src.adapters_plugins.adapter_registry import ADAPTER_REGISTRY
 
 class DataFile(Base):    
 
-    # Predefined Output specification
+    # Output is always a list of Items
     class OutputSpec(BaseModel):
-        data: Item
+        output_0: Item
 
     class ParamSpec(BaseModel):
         adapter_type: str
         provider_bpn: str
         provider_url: HttpUrl
         asset_id: str
-        access_mode: Literal['pull', 'push']
+        #TODO: access_mode: Literal['pull', 'push']
 
     def __init__(self, node: dict):
         super().__init__(node)
@@ -34,8 +34,24 @@ class DataFile(Base):
         provider_bpn = self.params['provider_bpn']
         provider_url = self.params['provider_url']
         asset_id = self.params['asset_id']
+        
+        response = self.adapter.transfer_data_pull(provider_bpn, provider_url, asset_id)
+        # check against the OutputSpec schema and save into a dict
+        data = Item(
+            json_data={
+                "content_type": response.headers.get("content-type"),
+                "content_length": response.headers.get("content-length"),
+                "source": { 
+                    "provider_url": provider_url,
+                    "provider_bpn": provider_bpn,
+                    "asset_id": asset_id
+                },
+            },
+            binary=response.content,
+        ).model_dump()
 
-        data = self.adapter.transfer_data_pull()
-
-        self.output = {}
-
+        # set 'data' as the output at port index 0
+        self.set_output(port=0, item=data)
+        self.finished = True
+        
+        return
