@@ -1,35 +1,37 @@
 from pydantic import BaseModel, HttpUrl
-from typing import Literal
-from schema.execution_schema import Item
-from src.node_plugins.base import Base
-from src.adapters_plugins.adapter_registry import ADAPTER_REGISTRY
+from typing import Literal, Any
+from cee.schema.execution_schema import Item
+from cee.node_plugins.base import Base
+from cee.adapters_plugins.adapter_registry import ADAPTER_REGISTRY
 
 
-class DataFile(Base):    
+class DataFile(Base):
+    """Data file node."""
 
     # Output is always a list of Items
     class OutputSpec(BaseModel):
         output_0: Item
 
     class ParamSpec(BaseModel):
+        """Data file node param spec."""
         adapter_type: str
         provider_bpn: str
         provider_url: HttpUrl
         asset_id: str
         #TODO: access_mode: Literal['pull', 'push']
 
-    def __init__(self, node: dict):
+    def __init__(self, node: dict[str, Any]) -> None:
+        """Initialize the instance."""
         super().__init__(node)
 
         # select the correct adapter based on the parameter value
-        adapter_type = self.params['adapter_type']
+        adapter_type = self.params["adapter_type"]
         self.adapter = ADAPTER_REGISTRY[adapter_type]()
 
     # Implement DataFile node behaviour
     # the outputs are stored in `self.outputs` and retrieved via the Get method
     def run(self, input_data: dict | None = None) -> None:
-        print ("DataFile node triggered")
-
+        """Run the ndoe."""
         # read parameter values
         provider_bpn = self.params['provider_bpn']
         provider_url = self.params['provider_url']

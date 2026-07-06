@@ -1,0 +1,23 @@
+from typing import Any
+
+from pydantic import BaseModel
+from cee.schema.execution_schema import Item
+from cee.node_plugins.base import Base
+
+
+class DataContainer(Base):
+    """Data container node."""
+
+    # Predefined Output specification
+    class OutputSpec(BaseModel):
+        """Data container node output spec."""
+
+        data: Item
+
+    def __init__(self, node: dict[str, Any]) -> None:
+        """Initialize the instance."""
+        super().__init__(node)
+
+    def run(self, input_data: dict | None = None) -> None:
+        """Run the node."""
+        print("DataContainer object triggered")

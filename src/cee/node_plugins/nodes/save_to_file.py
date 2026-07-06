@@ -1,22 +1,27 @@
+from typing import Any
 from pydantic import BaseModel
+from cee.schema.execution_schema import Item
 from pathlib import Path
-from schema.execution_schema import Item
-from src.node_plugins.base import Base
-from pathlib import Path
+from cee.node_plugins.base import Base
+
 
 class SaveToFile(Base):
-    
+    """Save to file node."""
+
     # Predefined Output specification
     class InputSpec(BaseModel):
+        """Safe to file node input spec."""
         input_0: Item
 
     class ParamSpec(BaseModel):
+        """Safe to file node param spec."""
         file_path: Path
 
-    def __init__(self, node: dict):
+    def __init__(self, node: dict[str, Any]) -> None:
+        """Initialize the instance."""
         super().__init__(node)
 
-    def run(self, input_data: dict | None = None) -> None: 
+    def run(self, input_data: dict | None = None) -> None:
         print ("SaveToFile node triggered")
 
         # check input schema
