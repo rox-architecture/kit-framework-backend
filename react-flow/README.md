@@ -39,14 +39,9 @@ Now, run the GUI by:
 npm run dev
 ```
 
-## Basic Tutorial
+## Notes:
 
-You can access the GUI via `http://localhost:5173/` or the port displayed on the console.
-
-- In the side bar menu, you can add a node, export & import the grapn JSON
-- Clicking a node will show additional side bar menus
-    - Label = Node name
-    - +Add Parameter will add Parameter
-    - Parameter order can change (move up or down)
-    - The I/O port numbers can also change
+- Use this GUI to quickly create a testing workflow graph
+- Export the graph to JSON
+- Our workflow execution engine takes the graph JSON to execute
 
