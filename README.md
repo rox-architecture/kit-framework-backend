@@ -63,7 +63,7 @@ npm install @xyflow/react
 
 Overwrite the `App.jsx` file:
 ```bash
-mv ../App.jsx src/App.jsx
+cp ../App.jsx src/App.jsx
 ```
 
 Check if everything is installed correctly
