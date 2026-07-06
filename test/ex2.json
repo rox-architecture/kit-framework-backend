@@ -1,68 +1,74 @@
 {
   "nodes": [
     {
-      "id": "node-1783154898635",
+      "id": "node-1783344464430",
       "type": "custom",
       "position": {
-        "x": -141.34877942359907,
-        "y": -30.940138396839288
+        "x": -261.88499948002595,
+        "y": -18.158736798317975
       },
       "data": {
-        "label": "MNIST dataset",
+        "label": "Fashion MNIST dataset",
         "params": {
+          "type": "data_file",
           "adapter_type": "dlr_connector",
-          "type": "data_file"
+          "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/joao-connector/cp/protocol",
+          "provider_bpn": "BPNLYJ7XQDLOX12U",
+          "asset_id": "Fashion MNIST trainset"
         },
         "paramOrder": [
+          "type",
           "adapter_type",
-          "type"
+          "provider_url",
+          "provider_bpn",
+          "asset_id"
         ],
         "inputCount": 0,
         "outputCount": 1
       },
       "measured": {
-        "width": 201,
-        "height": 162
+        "width": 547,
+        "height": 224
       },
       "selected": false,
       "dragging": false
     },
     {
-      "id": "node-1783160572690",
+      "id": "node-1783344667589",
       "type": "custom",
       "position": {
-        "x": 167.46932741419428,
-        "y": 15.213390532286198
+        "x": 423.5616046255054,
+        "y": 0.22813186082804293
       },
       "data": {
         "label": "Save To File",
         "params": {
-          "scope": "utility",
-          "type": "save_to_file"
+          "type": "save_to_file",
+          "file_path": "download/data.zip"
         },
         "paramOrder": [
-          "scope",
-          "type"
+          "type",
+          "file_path"
         ],
         "inputCount": 1,
         "outputCount": 0
       },
       "measured": {
-        "width": 174,
-        "height": 162
+        "width": 180,
+        "height": 120
       },
-      "selected": true,
+      "selected": false,
       "dragging": false
     }
   ],
   "edges": [
     {
-      "source": "node-1783154898635",
-      "sourceHandle": "output-0",
-      "target": "node-1783160572690",
-      "targetHandle": "input-0",
-      "id": "edge-1783160631426",
-      "animated": true
+      "source": "node-1783344464430",
+      "sourceHandle": "output_0",
+      "target": "node-1783344667589",
+      "targetHandle": "input_0",
+      "animated": true,
+      "id": "xy-edge__node-1783344464430output_0-node-1783344667589input_0"
     }
   ]
 }
