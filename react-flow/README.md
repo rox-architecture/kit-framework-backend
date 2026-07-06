@@ -1,36 +1,47 @@
-# Easy graph JSON generation for testing purpose
+# Test Purpose Graph Editor GUI
 
-## React Flow Installation
+We want to test our workflow execution engine with various workflow graphs and nodes.
+For this, an easy-to-use graph editor will be useful. 
+With this, we can quickly create and modify the workflow graphs to observe the results of the engine.
 
-Navigate to this folder `react-flow-tester` (i.e., $pwd = here). Then, for installing:
+## Install
 
+From the repository root, go to the react-flow directory:
+```
+cd react-flow
+```
+
+Then, install a React-Flow server. You need `npm`.
 ```
 npm create vite@latest react-flow-editor -- --template react
 cd react-flow-editor
 npm install
 npm install @xyflow/react
-npm run dev
 ```
 
-Check installation was successful:
+In the `react-flow-editor` directory, overwrite the `react-App.jsx` file with the provided one
+```
+cp ../App.jsx src/App.jsx
+```
 
-``` 
+Check if everything is installed correctly
+```
 npm list @xyflow/react
 ```
 
-If `(empty)` is shown, then try:
-
+If (empty) is shown, then try again:
 ```
 npm install @xyflow/react
 ```
 
-## App.jsx file
-
-In the *react-flow-tester*, there is `App.jsx` file.
-After installing react flow, you will see `src` folder is created in the current path (inside the react-flow-tester folder). There, replace `src/App.jsx` with the one provided in the react-flow-tester.
-
-## Run 
-
+Now, run the GUI by:
 ```
 npm run dev
 ```
+
+## Notes:
+
+- Use this GUI to quickly create a testing workflow graph
+- Export the graph to JSON
+- Our workflow execution engine takes the graph JSON to execute
+
