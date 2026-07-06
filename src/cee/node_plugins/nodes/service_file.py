@@ -14,8 +14,7 @@ class ServiceFile(Base):
     # Predefined Output specification
     class OutputSpec(BaseModel):
         """Service file node output spec."""
-
-        data: Item
+        output_0: Item
 
     def __init__(self, node: dict[str, Any]) -> None:
         """Initialize the instance."""

@@ -76,13 +76,31 @@ class ExecutionManager:
             # ----------------------------------------------------------------------
             # Execute the node objects and handle their connections
             # ----------------------------------------------------------------------
-            for index, generation in enumerate(
-                sequence
-            ):  # iterate over the execution sequence
-                # for now, all the nodes are sequentially executed
+            for index, generation in enumerate(sequence): # iterate over the execution sequence
+                # sequential node execution 
+                # TODO: parallelisation
                 for node_id in generation:
+                    # this is the current node to execute
                     node_obj = executable_nodes[node_id]
+
+                    # the node needs input data to execute
+                    ingress_edges = [e for e in graph['edges'] if e['target'] == node_id]
                     input_data = {}
+
+                    # collect the input_data required
+                    for e in ingress_edges:
+                        # find out the source node and port information
+                        predescent_node_id = e['source']
+                        source_port_ref = e['sourceHandle']
+
+                        # get the predescent node executable object to get the output Item
+                        predescent_node_obj = executable_nodes[predescent_node_id]
+                        item = predescent_node_obj.get_output(source_port_ref)
+
+                        # find out which input port this Item is connected
+                        target_port_ref = e['targetHandle']
+                        input_data[target_port_ref] = item
+
                     node_obj.run(input_data)
 
         except asyncio.CancelledError:

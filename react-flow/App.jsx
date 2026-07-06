@@ -30,8 +30,8 @@ function CustomNode({ data }) {
     >
       {Array.from({ length: inputCount }).map((_, index) => (
         <Handle
-          key={`input-${index}`}
-          id={`input-${index}`}
+          key={`input_${index}`}
+          id={`input_${index}`}
           type="target"
           position={Position.Left}
           style={{ top: `${((index + 1) / (inputCount + 1)) * 100}%` }}
@@ -54,8 +54,8 @@ function CustomNode({ data }) {
 
       {Array.from({ length: outputCount }).map((_, index) => (
         <Handle
-          key={`output-${index}`}
-          id={`output-${index}`}
+          key={`output_${index}`}
+          id={`output_${index}`}
           type="source"
           position={Position.Right}
           style={{ top: `${((index + 1) / (outputCount + 1)) * 100}%` }}
