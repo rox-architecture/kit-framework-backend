@@ -53,20 +53,19 @@ async def register_workflow(request: GraphInput):
 
     try:
         parser = SequenceGenerator(graph)
-        if not parser.check_DAG():
+        if not parser.check_dag():
             raise HTTPException(
                 status_code=400, detail="Graph is not Directed Acyclic Graph (DAG)."
             )
 
         execution_flow = parser.generate_plan()
 
-        db = DbHandlerWorkflow()
-        result = db.insert_workflow(name, graph, execution_flow)
+        result = DbHandlerWorkflow.insert_workflow(name, graph, execution_flow)
 
         return {
-            "workflow_id": result["workflow_id"],
+            "workflow_id": result.workflow_id,
             "workflow_name": name,
-            "updated_at": result["updated_at"],
+            "updated_at": result.updated_at,
             "execution_flow": execution_flow,
         }
 
@@ -76,15 +75,12 @@ async def register_workflow(request: GraphInput):
 
 @app.get("/workflows/show/all")
 async def get_all_workflow():
-    db = DbHandlerWorkflow()
-    return {"workflow_ids": db.get_all()}
+    return {"workflow_ids": [workflow.workflow_id for workflow in DbHandlerWorkflow.get_all()]}
 
 
 @app.get("/workflows/{workflow_id}")
 async def get_workflow(workflow_id: str):
-    db = DbHandlerWorkflow()
-
-    workflow = db.get_workflow(workflow_id)
+    workflow = DbHandlerWorkflow.get_workflow(workflow_id)
 
     if workflow is None:
         raise HTTPException(
@@ -97,8 +93,7 @@ async def get_workflow(workflow_id: str):
 
 @app.delete("/workflows/{workflow_id}")
 async def delete_workflow(workflow_id: str):
-    db = DbHandlerWorkflow()
-    success = db.delete_workflow(workflow_id)
+    success = DbHandlerWorkflow.delete_workflow(workflow_id)
     if not success:
         raise HTTPException(
             status_code=404,
@@ -121,12 +116,9 @@ async def get_all_executions():
 
 @app.post("/execution/request")
 async def execution_request(request: ExecRequestInput):
-    schedule_db = DbHandlerExecution()
-    workflow_db = DbHandlerWorkflow()
-
     # reject if the workflow_id does not exist
     workflow_id = request.workflow_id
-    workflow = workflow_db.get_workflow(workflow_id)
+    workflow = DbHandlerWorkflow.get_workflow(workflow_id)
     if workflow is None:
         raise HTTPException(
             status_code=404,
@@ -134,15 +126,14 @@ async def execution_request(request: ExecRequestInput):
         )
 
     # push the execution object into the db table
-    result = schedule_db.insert_execution(workflow_id)
+    result = DbHandlerExecution.insert_execution(workflow_id)
 
-    return {"reference_id": result["reference_id"], "workflow_id": workflow_id}
+    return {"reference_id": result.reference_id, "workflow_id": workflow_id}
 
 
 @app.get("/execution/{execution_id}")
 async def get_execution(execution_id: str):
-    db = DbHandlerExecution()
-    execution = db.get_execution(execution_id)
+    execution = DbHandlerExecution.get_execution(execution_id)
 
     if execution is None:
         raise HTTPException(status_code=404, detail="Execution not found")
@@ -152,8 +143,7 @@ async def get_execution(execution_id: str):
 
 @app.delete("/execution/{execution_id}")
 async def cancel_execution(execution_id: str):
-    db = DbHandlerExecution()
-    success = db.cancel_execution(execution_id)
+    success = DbHandlerExecution.execution_cancelled(execution_id)
 
     if not success:
         raise HTTPException(status_code=404, detail="Execution not found")

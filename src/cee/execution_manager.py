@@ -27,7 +27,7 @@ class ExecutionManager:
         self._running = True
         print("[ExecutionManager] Started")
 
-        self._task = await asyncio.create_task(self.run())
+        self._task = asyncio.create_task(self.run())
 
     async def stop(self) -> None:
         """Stop the manager."""
