@@ -40,7 +40,7 @@ ruff check
 Run `mypy` for type checking via
 
 
-## Example Walk Through
+# Example Walk Through
 
 Before we start, setup the graph editor GUI [here](https://gitlab.dlr.de/ki-dataspace/canvas-execution-engine/-/blob/main/react-flow/README.md?ref_type=heads)
 
@@ -102,7 +102,7 @@ python trigger_execution.py <workflow-id>
 ```
 Substitute your workflow id in the command. This will trigger the execution of the workflow.
 
-After the execution, you will there is `download` folder created, and two data assets are saved as files (as specified as their respective `file_path` parameter).
+After the execution, you will see that `download` folder is created, and two data assets are saved as files (as specified as their respective `file_path` parameter).
 
 > [!WARNING]
 > The execution may fail in the first few runs due to the delay in the negotiation. In this case, wait a few mins for the negotiation to finish. Then, attempt again.
@@ -113,8 +113,23 @@ You can observe the DB tables using software like [DBeaver](https://dbeaver.io/)
 
 # Tips
 
-```mermaid
+## Overall Operation Lifecycle
 
+```mermaid
+flowchart LR
+    id1(Start) --> id2(Receive Workflow) --> id3(Execute Workflow) --> id4(Finish Execution)
+
+    subgraph DB
+        direction TB
+        WorkflowDB[(Workflow Table)]
+        ExecutionDB[(Execution Table)]
+    end
+
+    id2(Receive Workflow) --> WorkflowDB[(Workflow Table)]
+
+    id3(Execute Workflow) --> ExecutionDB[(Execution Table)]
+
+    id4(Finish Execution) --> ExecutionDB[(Execution Table)]
 ```
 
 
