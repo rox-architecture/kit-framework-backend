@@ -2,10 +2,10 @@
 .venv
 .env
 download
-react-flow-tester/**
-!react-flow-tester
-!react-flow-tester/README.md
-!react-flow-tester/App.jsx
+react-flow/**
+!react-flow
+!react-flow/README.md
+!react-flow/App.jsx
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
