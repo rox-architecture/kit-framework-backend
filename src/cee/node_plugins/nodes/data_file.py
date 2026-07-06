@@ -16,7 +16,6 @@ class DataFile(Base):
 
     class ParamSpec(BaseModel):
         """Data file node param spec."""
-
         adapter_type: str
         provider_bpn: str
         provider_url: HttpUrl
