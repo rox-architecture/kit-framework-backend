@@ -132,6 +132,26 @@ flowchart LR
     id4(Finish Execution) --> ExecutionDB[(Execution Table)]
 ```
 
+## Basic Execution Rules
+
+- Every workflow is a DAG (i.e., no loop)
+- The I/O of every node is a list of `Item` (definition [here](https://gitlab.dlr.de/ki-dataspace/canvas-execution-engine/-/blob/main/src/cee/schema/execution_schema.py?ref_type=heads)). Therefore, there is never IO type mismatch between nodes.
+- Every node has `InputSpec`, `OutputSpec`, and `ParamSpec` schemas (see [here](https://gitlab.dlr.de/ki-dataspace/canvas-execution-engine/-/blob/main/src/cee/node_plugins/base.py?ref_type=heads)).
+
+## Development: adding a new node
+
+1. add a new node class at `src/cee/node_plugins/nodes`
+2. register your node in [here](https://gitlab.dlr.de/ki-dataspace/canvas-execution-engine/-/blob/main/src/cee/node_plugins/node_registry.py?ref_type=heads)
+3. make sure that your class inherits the [base class](https://gitlab.dlr.de/ki-dataspace/canvas-execution-engine/-/blob/main/src/cee/node_plugins/base.py?ref_type=heads) 
+
+## Development: connecting to another dataspace
+
+1. add a new adapter class at `src/cee/adapters_plugins`
+2. register your adapter in [here](https://gitlab.dlr.de/ki-dataspace/canvas-execution-engine/-/blob/main/src/cee/adapters_plugins/adapter_registry.py?ref_type=heads)
+3. make sure that your adapter inherits the [base class](https://gitlab.dlr.de/ki-dataspace/canvas-execution-engine/-/blob/main/src/cee/adapters_plugins/adapter.py?ref_type=heads) 
+
+
+
 
 
 
