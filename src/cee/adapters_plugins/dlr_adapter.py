@@ -85,12 +85,12 @@ class DlrAdapter(Adapter):
         endpoint = "cp/management/v3/edrs"
         url = f"{self.base_url}/{endpoint}"
         offer = self._get_target_offer_by_id(provider_bpn, asset_id)
-
+        
         payload = {
             "@context": {"odrl": "http://www.w3.org/ns/odrl/2/"},
-            "counterPartyAddress": provider_url,
+            "counterPartyAddress": str(provider_url),
             "protocol": "dataspace-protocol-http",
-            "policy": offer["policy"]
+            "policy": offer["policy"][0] # TODO: for now we take the first one, otherwise the code crash
             | {
                 "odrl:assigner": {"@id": provider_bpn},
                 "odrl:target": {"@id": asset_id},
@@ -120,7 +120,7 @@ class DlrAdapter(Adapter):
             self._make_negotiation(provider_bpn, provider_url, asset_id)
             # try again after negotiation
             endpoint, token = self._request_edr(asset_id)
-
+        
         # pull the http data
         assert endpoint is not None
         header = {"Authorization": token}

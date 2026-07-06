@@ -32,6 +32,8 @@ class DataFile(Base):
     # the outputs are stored in `self.outputs` and retrieved via the Get method
     def run(self, input_data: dict | None = None) -> None:
         """Run the ndoe."""
+        print(f"[Node {self.node_id}] Execution started")
+
         # read parameter values
         provider_bpn = self.params['provider_bpn']
         provider_url = self.params['provider_url']
