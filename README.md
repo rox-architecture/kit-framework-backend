@@ -117,7 +117,7 @@ You can observe the DB tables using software like [DBeaver](https://dbeaver.io/)
 
 ```mermaid
 flowchart LR
-    id1(Start) --> id2(Receive Workflow) --> id3(Execute Workflow) --> id4(Finish Execution)
+    id1(Start) --/workflows/request--> id2(Receive Workflow) --/execution/request--> id3(Execute Workflow) --> id4(Finish Execution)
 
     subgraph DB
         direction TB
@@ -125,12 +125,14 @@ flowchart LR
         ExecutionDB[(Execution Table)]
     end
 
-    id2(Receive Workflow) --> WorkflowDB[(Workflow Table)]
+    id2(Receive Workflow) --add/remove--> WorkflowDB[(Workflow Table)]
 
-    id3(Execute Workflow) --> ExecutionDB[(Execution Table)]
+    id3(Execute Workflow) --add/update--> ExecutionDB[(Execution Table)]
 
-    id4(Finish Execution) --> ExecutionDB[(Execution Table)]
+    id4(Finish Execution) --delete--> ExecutionDB[(Execution Table)]
 ```
+Everytime the execution engine runs freshly, the execution table is wiped (reset). 
+
 
 ## Basic Execution Rules
 
