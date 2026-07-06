@@ -127,9 +127,9 @@ flowchart LR
 
     id2(Receive Workflow) --add/remove--> WorkflowDB[(Workflow Table)]
 
-    id3(Execute Workflow) --add/update--> ExecutionDB[(Execution Table)]
+    id3(Execute Workflow) --add--> ExecutionDB[(Execution Table)]
 
-    id4(Finish Execution) --delete--> ExecutionDB[(Execution Table)]
+    id4(Finish Execution) --update--> ExecutionDB[(Execution Table)]
 ```
 Everytime the execution engine runs freshly, the execution table is wiped (reset). 
 
