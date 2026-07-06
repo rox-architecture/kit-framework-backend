@@ -44,44 +44,6 @@ Run `mypy` for type checking via
 
 To play with our engine, the user needs an easy way to create and modify the workflow graphs, to observe the outputs of our engine. For this, we first setup a test-purpose graph editor GUI. After the GUI setup, we will go through our example step-by-step. 
 
---- 
-
-### Test Purpose Graph Editor GUI
-
-Go to the react-flow directory:
-```bash
-cd react-flow
-```
-
-Then, install a React-Flow server. You need `npm`.
-```bash
-npm create vite@latest react-flow-editor -- --template react
-cd react-flow-editor
-npm install
-npm install @xyflow/react
-```
-
-Overwrite the `App.jsx` file:
-```bash
-cp ../App.jsx src/App.jsx
-```
-
-Check if everything is installed correctly
-```bash
-npm list @xyflow/react
-```
-If (empty) is shown, then try again:
-```bash
-npm install @xyflow/react
-```
-
-Now, run the GUI by:
-```bash
-npm run dev
-```
-You can access the GUI via `http://localhost:5173/` 
-
----
 
 ### Step-by-step Example Walk Through
 
