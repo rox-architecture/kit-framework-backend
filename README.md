@@ -40,20 +40,17 @@ ruff check
 Run `mypy` for type checking via
 
 
-## Getting Started With An Example
+## Example Walk Through
 
-To play with our engine, the user needs an easy way to create and modify the workflow graphs, to observe the outputs of our engine. For this, we first setup a test-purpose graph editor GUI. After the GUI setup, we will go through our example step-by-step. 
+Before we start, setup the graph editor GUI [here](https://gitlab.dlr.de/ki-dataspace/canvas-execution-engine/-/blob/main/react-flow/README.md?ref_type=heads)
 
-
-### Step-by-step Example Walk Through
-
-First, we make the `.env` file. In the console,
+### 1. Prepare .env file
 
 ```bash
 cp .env.example .env
 ```
 
-Then, open `.env` with a text editor, and complete the two variables. These variables are needed to access the dataspace API.
+In the `.env` file, complete two variables, which are needed to access the dataspace API.
 ```
 BASE_URL_DLR_CONNECTOR=...
 API_KEY_DLR_CONNECTOR=...
@@ -61,9 +58,13 @@ API_KEY_DLR_CONNECTOR=...
 - BASE_URL_DLR_CONNECTOR looks like `https://vision-x-api.base-x-ecosystem.org/connectors/jin-conn`
 - API_KEY_DLR_CONNECTOR looks like `sk-...`
 
-Now, run the engine to load the environment variables. If it was already running, close it and run again. 
+Our engine needs to run again to load the environment variables.
 ```bash
 python main.py
 ```
+
+### 2. Check the example workflow graph
+
+
 
 
