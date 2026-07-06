@@ -1,10 +1,12 @@
 import requests
 import json
 import random
+import sys
 
 url = "http://localhost:8080/workflows"
+filename = sys.argv[1]
 
-with open("ex2.json", "r", encoding="utf-8") as f:
+with open(filename, "r", encoding="utf-8") as f:
     graph_json = json.load(f)
 
 n = random.randint(1, 1000)

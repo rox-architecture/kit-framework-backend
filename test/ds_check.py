@@ -1,6 +1,8 @@
 import requests
 import json
 
+# test if ds can be accessed
+
 URL = "https://vision-x-api.base-x-ecosystem.org/connectors/jin-conn/cp/management/v3/edrs/request"
 
 payload = {

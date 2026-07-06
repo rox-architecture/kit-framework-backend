@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ReactFlow,
   Background,
@@ -69,9 +69,11 @@ export default function App() {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [selectedEdgeId, setSelectedEdgeId] = useState(null);
 
   const nodeTypes = useMemo(() => ({ custom: CustomNode }), []);
   const selectedNode = nodes.find((node) => node.id === selectedNodeId);
+  const selectedEdge = edges.find((edge) => edge.id === selectedEdgeId);
 
   const getParamOrder = (node) =>
     node.data.paramOrder || Object.keys(node.data.params || {});
@@ -208,6 +210,66 @@ export default function App() {
     );
   };
 
+  const deleteSelectedNode = useCallback(() => {
+    if (!selectedNodeId) return;
+
+    setNodes((currentNodes) =>
+      currentNodes.filter((node) => node.id !== selectedNodeId)
+    );
+
+    setEdges((currentEdges) =>
+      currentEdges.filter(
+        (edge) =>
+          edge.source !== selectedNodeId &&
+          edge.target !== selectedNodeId &&
+          edge.id !== selectedEdgeId
+      )
+    );
+
+    setSelectedNodeId(null);
+    setSelectedEdgeId(null);
+  }, [selectedNodeId, selectedEdgeId]);
+
+  const deleteSelectedEdge = useCallback(() => {
+    if (!selectedEdgeId) return;
+
+    setEdges((currentEdges) =>
+      currentEdges.filter((edge) => edge.id !== selectedEdgeId)
+    );
+
+    setSelectedEdgeId(null);
+  }, [selectedEdgeId]);
+
+  const deleteSelected = useCallback(() => {
+    if (selectedNodeId) {
+      deleteSelectedNode();
+      return;
+    }
+
+    if (selectedEdgeId) {
+      deleteSelectedEdge();
+    }
+  }, [selectedNodeId, selectedEdgeId, deleteSelectedNode, deleteSelectedEdge]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const tagName = event.target.tagName;
+      const isTyping = ["INPUT", "TEXTAREA", "SELECT"].includes(tagName);
+
+      if (isTyping) return;
+
+      if (event.key === "Delete" || event.key === "Backspace") {
+        deleteSelected();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [deleteSelected]);
+
   const exportJson = () => {
     const graph = { nodes, edges };
     const json = JSON.stringify(graph, null, 2);
@@ -222,6 +284,38 @@ export default function App() {
     anchor.click();
 
     URL.revokeObjectURL(url);
+  };
+
+  const importJson = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = (readerEvent) => {
+      try {
+        const graph = JSON.parse(readerEvent.target.result);
+
+        if (!Array.isArray(graph.nodes) || !Array.isArray(graph.edges)) {
+          alert("Invalid graph JSON. Expected { nodes: [], edges: [] }.");
+          return;
+        }
+
+        setNodes(graph.nodes);
+        setEdges(graph.edges);
+        setSelectedNodeId(null);
+        setSelectedEdgeId(null);
+
+        alert("Import completed.");
+      } catch (error) {
+        console.error(error);
+        alert("Invalid JSON file.");
+      }
+    };
+
+    reader.readAsText(file);
+
+    event.target.value = "";
   };
 
   const onNodesChange = useCallback((changes) => {
@@ -241,6 +335,15 @@ export default function App() {
   const selectedParamOrder = selectedNode
     ? selectedNode.data.paramOrder || Object.keys(selectedNode.data.params || {})
     : [];
+
+  const visibleEdges = useMemo(
+    () =>
+      edges.map((edge) => ({
+        ...edge,
+        selected: edge.id === selectedEdgeId,
+      })),
+    [edges, selectedEdgeId]
+  );
 
   return (
     <div style={{ display: "flex", width: "100vw", height: "100vh" }}>
@@ -263,11 +366,48 @@ export default function App() {
           Export JSON
         </button>
 
+        <button
+          onClick={() => document.getElementById("import-json").click()}
+          style={{ width: "100%", marginTop: 8 }}
+        >
+          Import JSON
+        </button>
+
+        <input
+          id="import-json"
+          type="file"
+          accept=".json,application/json"
+          style={{ display: "none" }}
+          onChange={importJson}
+        />
+
         <hr />
 
-        {selectedNode ? (
+        {selectedEdge ? (
+          <>
+            <h3>Selected Edge</h3>
+
+            <p style={{ fontSize: 12 }}>
+              {selectedEdge.source} → {selectedEdge.target}
+            </p>
+
+            <button
+              onClick={deleteSelectedEdge}
+              style={{ width: "100%", marginTop: 8 }}
+            >
+              Delete Edge
+            </button>
+          </>
+        ) : selectedNode ? (
           <>
             <h3>Selected Node</h3>
+
+            <button
+              onClick={deleteSelectedNode}
+              style={{ width: "100%", marginBottom: 12 }}
+            >
+              Delete Node
+            </button>
 
             <label>
               Label
@@ -368,13 +508,23 @@ export default function App() {
       <main style={{ flex: 1 }}>
         <ReactFlow
           nodes={nodes}
-          edges={edges}
+          edges={visibleEdges}
           nodeTypes={nodeTypes}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
-          onNodeClick={(_, node) => setSelectedNodeId(node.id)}
-          onPaneClick={() => setSelectedNodeId(null)}
+          onNodeClick={(_, node) => {
+            setSelectedNodeId(node.id);
+            setSelectedEdgeId(null);
+          }}
+          onEdgeClick={(_, edge) => {
+            setSelectedEdgeId(edge.id);
+            setSelectedNodeId(null);
+          }}
+          onPaneClick={() => {
+            setSelectedNodeId(null);
+            setSelectedEdgeId(null);
+          }}
           fitView
         >
           <Background />

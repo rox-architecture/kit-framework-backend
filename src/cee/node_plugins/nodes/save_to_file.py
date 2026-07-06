@@ -22,8 +22,6 @@ class SaveToFile(Base):
         super().__init__(node)
 
     def run(self, input_data: dict | None = None) -> None:
-        print ("SaveToFile node triggered")
-
         # check input schema
         validated_input = self.InputSpec.model_validate(input_data)
 
