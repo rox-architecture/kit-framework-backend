@@ -1,8 +1,8 @@
 from typing import Any, Literal
 from pydantic import BaseModel, HttpUrl
-from cee.schema.execution_schema import Item
 from cee.node_plugins.base import Base
 from cee.adapters_plugins.adapter_registry import ADAPTER_REGISTRY
+import docker 
 
 class DataContainer(Base):
     """Data container node."""
@@ -13,10 +13,13 @@ class DataContainer(Base):
         provider_bpn: str
         provider_url: HttpUrl
         asset_id: str
-        image_name: str
+
         representation: Literal['Dockerfile'] # TODO: add more types like oci-archive, oci-registry
         platforms: set[ Literal['linux/amd64', 'linux/arm64', 'windows/amd64', 'windows/arm64'] ]
+
+        image_name: str
         image_tag: str
+        registry_addr: str
         
     def __init__(self, node: dict[str, Any]) -> None:
         """Initialize the instance."""
@@ -42,8 +45,11 @@ class DataContainer(Base):
 
             dockerfile_data = response.content
 
+            registry = self.params['registry_addr']
             image_name = self.params['image_name']
             image_tag = self.params['image_tag']
+            full_image_name = f"{registry}/{image_name}:{image_tag}"
+            
             # TODO: do I need to write it into the Dockerfile?
             # TODO: how can I register the image to the docker registry v2?
             

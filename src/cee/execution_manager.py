@@ -101,7 +101,9 @@ class ExecutionManager:
                         target_port_ref = e['targetHandle']
                         input_data[target_port_ref] = item
 
-                    node_obj.run(input_data)
+                    # execute the node in a non-blocking way
+                    await asyncio.to_thread(node_obj.run, input_data)
+
 
         except asyncio.CancelledError:
             print(f"[Execution {reference_id}] Cancelled workflow {reference_id}")
@@ -147,7 +149,7 @@ class ExecutionManager:
                 print(
                     f"[ExecutionManager] {len(execution_items)} workflow(s) started execution"
                 )
-                await asyncio.sleep(5)
+                await asyncio.sleep(2)
 
         except asyncio.CancelledError:
             print("[ExecutionManager] Cancelled")
