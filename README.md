@@ -165,3 +165,7 @@ docker run -d \
   registry:2
 ```
 
+Checking the pushed images
+```
+curl http://localhost:5000/v2/_catalog
+```
