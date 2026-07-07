@@ -58,4 +58,3 @@ class DataFile(Base):
         self.set_output(port=0, item=data)
         self.finished = True
         
-        return

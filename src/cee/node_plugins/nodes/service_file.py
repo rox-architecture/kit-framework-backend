@@ -23,3 +23,5 @@ class ServiceFile(Base):
     def run(self, input_data: dict | None = None) -> None:
         """Run the node."""
         print("ServiceFile object triggered")
+
+        return
