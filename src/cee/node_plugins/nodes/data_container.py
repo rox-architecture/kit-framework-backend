@@ -1,5 +1,5 @@
 from typing import Any, Literal
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, field_validator
 from cee.node_plugins.base import Base
 from cee.adapters_plugins.adapter_registry import ADAPTER_REGISTRY
 import docker
@@ -17,12 +17,19 @@ class DataContainer(Base):
         provider_url: HttpUrl
         asset_id: str
 
-        representation: Literal['Dockerfile'] # TODO: add more types like oci-archive, oci-registry
+        representation: Literal['Dockerfile'] # TODO: add more types like [oci-archive, oci-registry, git-repo]
         platforms: set[ Literal['linux/amd64', 'linux/arm64', 'windows/amd64', 'windows/arm64'] ]
 
         image_name: str
         image_tag: str
         registry_addr: str | None = None
+
+        @field_validator("platforms", mode="before")
+        @classmethod
+        def normalize_platforms(cls, v):
+            if isinstance(v, str):
+                return {v}
+            return v
         
     def __init__(self, node: dict[str, Any]) -> None:
         """Initialize the instance."""
@@ -45,16 +52,17 @@ class DataContainer(Base):
             provider_url = self.params['provider_url']
             asset_id = self.params['asset_id']
             response = self.adapter.transfer_data_pull(provider_bpn, provider_url, asset_id)
-            dockerfile_content = response.content
-
+            dockerfile_content = response.text  
+            
             # start building the docker container image
             client = docker.from_env()
 
             image_name = self.params['image_name']
             image_tag = self.params['image_tag']
-            
-            if "registry_addr" in self.params:
-                registry = self.params['registry_addr']
+            registry = self.params.get("registry_addr")
+
+            if registry:
+                registry = registry.rstrip("/")
                 full_image_name = f"{registry}/{image_name}:{image_tag}"
                 push = True
             else:

@@ -153,7 +153,15 @@ Everytime the execution engine runs freshly, the execution table is wiped (reset
 3. make sure that your adapter inherits the [base class](https://gitlab.dlr.de/ki-dataspace/canvas-execution-engine/-/blob/main/src/cee/adapters_plugins/adapter.py?ref_type=heads) 
 
 
+## Additional Notes
 
+Docker registry v2 running 
 
-
+```
+docker run -d \
+  --name local-registry \
+  -p 5000:5000 \
+  --restart=always \
+  registry:2
+```
 
