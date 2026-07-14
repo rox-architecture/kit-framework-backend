@@ -11,7 +11,7 @@ import tarfile
 import zipfile
 
 
-class DataContainer(Base):
+class ContainerImage(Base):
     """Data container node."""
 
     class ParamSpec(BaseModel):
@@ -76,7 +76,7 @@ class DataContainer(Base):
             push = False
 
         # access the dataspace asset
-        response = self.adapter.transfer_data_pull(provider_bpn, provider_url, asset_id)
+        response = self.adapter.transfer_data_pull(asset_id)
 
         # instantiate the docker object
         client = docker.from_env()

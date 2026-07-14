@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Literal, Any
 from cee.node_plugins.base import Base
-from cee.adapters_plugins.adapter_registry import ADAPTER_REGISTRY
 from kubernetes import client, config
 from kubernetes.client.exceptions import ApiException
 
