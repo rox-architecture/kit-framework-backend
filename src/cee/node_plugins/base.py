@@ -40,6 +40,11 @@ class Base(ABC):
         """Return the input spec."""
         return cls.InputSpec.model_fields
 
+    @abstractmethod
+    def check_validty(self) -> bool:
+        # If nothing to check, return True by default
+        ...
+
     @classmethod
     def get_output_spec(cls):
         """Return the output spec."""

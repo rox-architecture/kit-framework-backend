@@ -74,6 +74,12 @@ class ExecutionManager:
                 )  # instantiate the node object
 
             # ----------------------------------------------------------------------
+            # Check the workflow validity (executability)
+            # ----------------------------------------------------------------------
+            
+
+
+            # ----------------------------------------------------------------------
             # Execute the node objects and handle their connections
             # ----------------------------------------------------------------------
             for index, generation in enumerate(sequence): # iterate over the execution sequence
