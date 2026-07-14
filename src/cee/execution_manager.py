@@ -76,8 +76,10 @@ class ExecutionManager:
             # ----------------------------------------------------------------------
             # Check the workflow validity (executability)
             # ----------------------------------------------------------------------
-            
 
+            if not all(node.check_validty() for node in executable_nodes):
+                error_message = "Workflow invalid"
+                raise ValueError(error_message)
 
             # ----------------------------------------------------------------------
             # Execute the node objects and handle their connections

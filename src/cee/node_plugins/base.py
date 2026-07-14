@@ -40,11 +40,6 @@ class Base(ABC):
         """Return the input spec."""
         return cls.InputSpec.model_fields
 
-    @abstractmethod
-    def check_validty(self) -> bool:
-        # If nothing to check, return True by default
-        ...
-
     @classmethod
     def get_output_spec(cls):
         """Return the output spec."""
@@ -59,12 +54,17 @@ class Base(ABC):
         reference = f'output_{port}'
         self.outputs[reference] = item
 
-    def get_output(self, ref: str) -> dict: 
+    def get_output(self, ref: str) -> dict:
         # check whether the output match the spec
         self.OutputSpec(**self.outputs)
 
         # Note: triggering get_output before 'run' can throw an error because the outputs are not yet created
         return self.outputs.get(ref)
+
+
+    def check_validty(self) -> bool:
+        """Check whether the node is valid."""
+        return True
 
     @abstractmethod
     def run(self, input_data: dict | None = None) -> None:

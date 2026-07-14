@@ -1,4 +1,5 @@
 import os
+from functools import lru_cache
 from typing import Any
 
 import requests
@@ -36,12 +37,14 @@ class DlrAdapter(Adapter):
         self.session = requests.Session()
         self.session.headers.update({"Authorization": f"Bearer {self.api_key}"})
 
+    @lru_cache(maxsize=1)
     def _get_catalogs(self) -> list[Catalog]:
         """Return the federated catalog."""
         response = requests.get(self.catalog_url, timeout=30)
         response.raise_for_status()
         return FederatedCatalogAdapter.validate_python(response.json())
 
+    @lru_cache(maxsize=1)
     def _get_edrs(self) -> list[Edr]:
         """Return all EDRs."""
         endpoint = "cp/management/v3/edrs/request"
@@ -84,7 +87,6 @@ class DlrAdapter(Adapter):
             return EdrDataAddress.model_validate(response.json())
         return None
 
-    # This internal method make a negotiation given the provider information and asset id
     # TODO: replace _get_target_offer_by_id with a proper way of fetching the policy
     def _initiate_negotiation(
         self, offer: Dataset, provider_bpn: str, provider_url: str
@@ -106,38 +108,39 @@ class DlrAdapter(Adapter):
         response = self.session.post(url, json=payload)
         response.raise_for_status()
 
-    # Interface method for returning the dataspace asset data
+    def get_negotiated_assets(self) -> set[str]:
+        """Return the IDs of all negotiated assets."""
+        return {edr.asset_id for edr in self._get_edrs()}
+
+    def initiate_negotiation(
+        self, provider_bpn: str, provider_url: str, asset_id: str
+    ) -> None:
+        """Initiate a negotiation for the asset with the given ID."""
+        catalogs = self._get_catalogs()
+        offer = self._get_offer(catalogs, provider_bpn, asset_id)
+
+        if offer is None:
+            error_message = "Offer not found"
+            raise PermissionError(error_message)
+
+        self._initiate_negotiation(offer, provider_bpn, provider_url)
+
     def transfer_data_pull(
         self,
-        provider_bpn: str,
-        provider_url: str,
         asset_id: str,
         *,
         method: str = "GET",
         subpath: str | None = None,
         payload: Any = None,
-        auto_nego: bool = True,
     ) -> requests.Response:
         """Initiate a PULL transfer for the asset with the given ID."""
         edrs = self._get_edrs()
         data_address = self._get_edr_data_address(edrs, asset_id)
 
-        if data_address is None and not auto_nego:
+        if data_address is None:
             error_message = "Negotiation required"
             raise PermissionError(error_message)
 
-        if data_address is None:  # automatic negotiation enabled
-            catalogs = self._get_catalogs()
-            offer = self._get_offer(catalogs, provider_bpn, asset_id)
-
-            if offer is None:
-                error_message = "Offer not found"
-                raise PermissionError(error_message)
-
-            self._initiate_negotiation(offer, provider_bpn, provider_url)
-            data_address = self._get_edr_data_address(edrs, asset_id)
-
-        assert data_address is not None
         url = data_address.endpoint + (subpath or "")
         headers = {"Authorization": data_address.authorization}
 
