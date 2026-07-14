@@ -1,8 +1,26 @@
-from pydantic import BaseModel
-from cee.adapters_plugins.adapter import Adapter
 import os
-import requests
 from typing import Any
+
+import requests
+from pydantic import TypeAdapter
+
+from cee.adapters_plugins.adapter import Adapter
+from cee.models.edc import Catalog, Dataset, Edr, EdrDataAddress, NegotiationInitiation
+
+FederatedCatalogAdapter = TypeAdapter(list[Catalog])
+EdrsAdapter = TypeAdapter(list[Edr])
+
+EDC_CONTEXT = {
+    "tx": "https://w3id.org/tractusx/v0.0.1/ns/",
+    "tx-auth": "https://w3id.org/tractusx/auth/",
+    "cx-policy": "https://w3id.org/catenax/2025/9/policy/",
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
+    "edc": "https://w3id.org/edc/v0.0.1/ns/",
+    "odrl": "http://www.w3.org/ns/odrl/2/",
+    "dcat": "http://www.w3.org/ns/dcat#",
+    "dct": "http://purl.org/dc/terms/",
+    "dspace": "https://w3id.org/dspace/v0.8/",
+}
 
 
 # This class can interact with the dataspace connector based on Tractus-X
@@ -11,95 +29,82 @@ class DlrAdapter(Adapter):
 
     def __init__(self) -> None:
         """Initialize the instance."""
+        self.catalog_url = "https://vision-x-api.base-x-ecosystem.org/federated/catalog"
         self.base_url = os.getenv("BASE_URL_DLR_CONNECTOR")
         self.api_key = os.getenv("API_KEY_DLR_CONNECTOR")
-        self.headers = {"Authorization": f"Bearer {self.api_key}"}
 
-    # Internal method for returning the EDR (endpoint, access_token), otherwise (None, None)
-    def _request_edr(self, asset_id: str) -> tuple[str | None, str | None]:
-        """Return the EDR data address for the asset with the given ID."""
-        # ---------------------------------
-        # STEP 1: obtain the transfer id
-        # ---------------------------------
+        self.session = requests.Session()
+        self.session.headers.update({"Authorization": f"Bearer {self.api_key}"})
+
+    def _get_catalogs(self) -> list[Catalog]:
+        """Return the federated catalog."""
+        response = requests.get(self.catalog_url, timeout=30)
+        response.raise_for_status()
+        return FederatedCatalogAdapter.validate_python(response.json())
+
+    def _get_edrs(self) -> list[Edr]:
+        """Return all EDRs."""
         endpoint = "cp/management/v3/edrs/request"
         url = f"{self.base_url}/{endpoint}"
         payload = {
-            "@context": {},
+            "@context": EDC_CONTEXT,
             "@type": "QuerySpec",
-            "filterExpression": [
-                {"operandLeft": "assetId", "operator": "=", "operandRight": asset_id}
-            ],
+            "offset": 0,
+            "limit": 10000,
         }
-        response = requests.post(url, json=payload, headers=self.headers)
-        if response.json() == []:
-            return None, None
-        transfer_id = response.json()[0]["transferProcessId"]
 
-        # ---------------------------------
-        # STEP 2: return (endpoint, access_token)
-        # ---------------------------------
-        endpoint = f"cp/management/v3/edrs/{transfer_id}/dataaddress"
-        url = f"{self.base_url}/{endpoint}"
-        response = requests.get(url, headers=self.headers)
-        access_token = response.json()["authorization"]
-        endpoint = response.json()["endpoint"]
-        return endpoint, access_token
+        response = self.session.post(url, json=payload)
+        response.raise_for_status()
+        return EdrsAdapter.validate_python(response.json())
 
     # TODO: re-implement this without using the federated catalogue
-    @staticmethod
-    def _get_target_offer_by_id(provider_id: str, asset_id: str) -> dict[str, Any]:
+    def _get_offer(
+        self, catalogs: list[Catalog], provider_id: str, asset_id: str
+    ) -> Dataset | None:
         """Return the offer for the asset with the given ID."""
-        response = requests.get(
-            url="https://vision-x-api.base-x-ecosystem.org/federated/catalog"
-        )
-        response.raise_for_status()
-
-        for cat in response.json():
-            participant_id = cat["dspace:participantId"]
-            originator = cat["originator"]
-            if participant_id != provider_id:  # filter out non-matching bpn
+        for catalog in catalogs:
+            if catalog.participant_id != provider_id:
                 continue
-            datasets = cat["dcat:dataset"]
-            if not isinstance(datasets, list):  # cast datasets into an array
-                datasets = [datasets]
-            if not datasets:  # skip if datasets is empty
-                continue
-            for asset in datasets:
-                if asset["@id"] != asset_id:  # not matching id
+            for dataset in catalog.datasets:
+                if dataset.asset_id != asset_id:
                     continue
+                return dataset
+        return None
 
-                # if match,
-                asset["participantId"] = participant_id
-                asset["originator"] = originator
-                asset["policy"] = asset["odrl:hasPolicy"]
-                return asset
-        # if not found
-        return {}
+    def _get_edr_data_address(
+        self, edrs: list[Edr], asset_id: str
+    ) -> EdrDataAddress | None:
+        """Return the EDR data address for the asset with the given ID."""
+        for edr in edrs:
+            if edr.asset_id != asset_id:
+                continue
+            endpoint = f"cp/management/v3/edrs/{edr.transfer_process_id}/dataaddress"
+            url = f"{self.base_url}/{endpoint}"
+            response = self.session.get(url)
+            return EdrDataAddress.model_validate(response.json())
+        return None
 
     # This internal method make a negotiation given the provider information and asset id
     # TODO: replace _get_target_offer_by_id with a proper way of fetching the policy
-    def _make_negotiation(
-        self, provider_bpn: str, provider_url: str, asset_id: str
-    ) -> requests.Response:
-        """Initiate a negotiation for the asset with the given ID."""
+    def _initiate_negotiation(
+        self, offer: Dataset, provider_bpn: str, provider_url: str
+    ) -> None:
+        """Initiate a negotiation for the given offer."""
+        policy = offer.policies[0] | {
+            "odrl:assigner": {"@id": provider_bpn},
+            "odrl:target": {"@id": offer.asset_id},
+        }
+        payload = NegotiationInitiation(
+            at_context=EDC_CONTEXT,
+            counter_party_address=provider_url,
+            protocol="dataspace-protocol-http",
+            policy=policy,
+        ).model_dump()
+
         endpoint = "cp/management/v3/edrs"
         url = f"{self.base_url}/{endpoint}"
-        offer = self._get_target_offer_by_id(provider_bpn, asset_id)
-        
-        payload = {
-            "@context": {"odrl": "http://www.w3.org/ns/odrl/2/"},
-            "counterPartyAddress": str(provider_url),
-            "protocol": "dataspace-protocol-http",
-            "policy": offer["policy"][0] # TODO: for now we take the first one, otherwise the code crash
-            | {
-                "odrl:assigner": {"@id": provider_bpn},
-                "odrl:target": {"@id": asset_id},
-            },
-        }
-
-        response = requests.post(url, json=payload, headers=self.headers)
+        response = self.session.post(url, json=payload)
         response.raise_for_status()
-        return response
 
     # Interface method for returning the dataspace asset data
     def transfer_data_pull(
@@ -108,22 +113,36 @@ class DlrAdapter(Adapter):
         provider_url: str,
         asset_id: str,
         *,
+        method: str = "GET",
+        subpath: str | None = None,
+        payload: Any = None,
         auto_nego: bool = True,
     ) -> requests.Response:
         """Initiate a PULL transfer for the asset with the given ID."""
-        endpoint, token = self._request_edr(asset_id)
+        edrs = self._get_edrs()
+        data_address = self._get_edr_data_address(edrs, asset_id)
 
-        if endpoint is None and not auto_nego:  # no automatic negotiation disabled
+        if data_address is None and not auto_nego:
             error_message = "Negotiation required"
             raise PermissionError(error_message)
-        if endpoint is None:  # automatic negotiation enabled
-            self._make_negotiation(provider_bpn, provider_url, asset_id)
-            # try again after negotiation
-            endpoint, token = self._request_edr(asset_id)
-        
-        # pull the http data
-        assert endpoint is not None
-        header = {"Authorization": token}
-        response = requests.get(endpoint, headers=header)
+
+        if data_address is None:  # automatic negotiation enabled
+            catalogs = self._get_catalogs()
+            offer = self._get_offer(catalogs, provider_bpn, asset_id)
+
+            if offer is None:
+                error_message = "Offer not found"
+                raise PermissionError(error_message)
+
+            self._initiate_negotiation(offer, provider_bpn, provider_url)
+            data_address = self._get_edr_data_address(edrs, asset_id)
+
+        assert data_address is not None
+        url = data_address.endpoint + (subpath or "")
+        headers = {"Authorization": data_address.authorization}
+
+        response = requests.request(
+            method, url, headers=headers, json=payload, timeout=30
+        )
         response.raise_for_status()
         return response

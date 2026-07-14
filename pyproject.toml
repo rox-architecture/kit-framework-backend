@@ -68,7 +68,9 @@ ignore = [
   "D212",    # multi line summary first line
   "E501",    # line length
   "S101",    # use of assert
-  "TC",      # move into type-checking block
+  "TC001",   # move into type-checking block
+  "TC002",   # move into type-checking block
+  "TC003",   # move into type-checking block
   "ANN401",  # dynamically typed expressions
   "BLE001",  # blind except catching
   "COM812",  # add trailing comma
