@@ -191,6 +191,31 @@ const PREDEFINED_NODE_TEMPLATES = {
     nullableParams: ["registry_addr"],
     lockedParams: ["type"],
   },
+  unzipper: {
+    label: "unzipper",
+    inputCount: 1,
+    outputCount: 1,
+    params: {
+      type: "unzipper",
+      target_zip: "",
+      extract_directory: "",
+    },
+    paramOrder: [
+      "type",
+      "target_zip",
+      "extract_directory",
+    ],
+    paramTypes: {
+      type: "string",
+      target_zip: "string",
+      extract_directory: "string",
+    },
+    paramValidators: {
+      target_zip: "path",
+      extract_directory: "path",
+    },
+    lockedParams: ["type"],
+  },
 };
 
 function CustomNode({ data }) {

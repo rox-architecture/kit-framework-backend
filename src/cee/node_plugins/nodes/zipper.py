@@ -5,10 +5,10 @@ from cee.node_plugins.base import Base
 import shutil
 
 class Zipper(Base):
-    """Save to file node."""
+    """Zipper node."""
 
     class ParamSpec(BaseModel):
-        """Safe to file node param spec."""
+        """Zipper node param spec."""
         target_directory: Path
         output_path: Path
 
