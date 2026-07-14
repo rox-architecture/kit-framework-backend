@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from pydantic import BaseModel
+from typing import Any
+
 import requests
 
 
@@ -10,12 +11,22 @@ class Adapter(ABC):
     """Abstract adapter."""
 
     @abstractmethod
+    def get_negotiated_assets(self) -> set[str]:
+        """Return the IDs of all negotiated assets."""
+
+    @abstractmethod
+    def initiate_negotiation(
+        self, provider_bpn: str, provider_url: str, asset_id: str
+    ) -> None:
+        """Initiate a negotiation for the asset with the given ID."""
+
+    @abstractmethod
     def transfer_data_pull(
         self,
-        provider_bpn: str,
-        provider_url: str,
         asset_id: str,
         *,
-        auto_nego: bool = True,
+        method: str = "GET",
+        subpath: str | None = None,
+        payload: Any = None,
     ) -> requests.Response:
-        ...
+        """Initiate a PULL transfer for the asset with the given ID."""
