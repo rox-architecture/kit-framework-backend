@@ -9,9 +9,6 @@ class ContainerDeploymentDocker(Base):
 
     class ParamSpec(BaseModel):
         """Container Deployment Docker node param spec."""
-
-        deployment_name: str
-
         image_name: str
         image_tag: str
         registry: str | None = None

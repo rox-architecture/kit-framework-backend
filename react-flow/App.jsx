@@ -18,18 +18,21 @@ const PREDEFINED_NODE_TEMPLATES = {
     inputCount: 1,
     outputCount: 2,
     params: {
+      type: "save_to_file",
       adapter_type: "",
       provider_bpn: "",
       provider_url: "",
       asset_id: "",
     },
     paramOrder: [
+      "type",
       "adapter_type",
       "provider_bpn",
       "provider_url",
       "asset_id",
     ],
     paramTypes: {
+      type: "string",
       adapter_type: "string",
       provider_bpn: "string",
       provider_url: "string",
@@ -38,6 +41,7 @@ const PREDEFINED_NODE_TEMPLATES = {
     paramValidators: {
       provider_url: "url",
     },
+    lockedParams: ["type"],
   },
 };
 
@@ -282,6 +286,7 @@ export default function App() {
           paramOrder: [...template.paramOrder],
           paramTypes: { ...template.paramTypes },
           paramValidators: { ...template.paramValidators },
+          lockedParams: [...(template.lockedParams || [])],
           inputCount: template.inputCount,
           outputCount: template.outputCount,
         },
@@ -358,6 +363,8 @@ export default function App() {
   };
 
   const startEditingParameter = (key) => {
+    if ((selectedNode.data.lockedParams || []).includes(key)) return;
+
     const value = selectedNode.data.params?.[key];
     const type = selectedNode.data.paramTypes?.[key] || inferParamType(value);
 
@@ -367,6 +374,11 @@ export default function App() {
   };
 
   const saveEditedParameter = () => {
+    if ((selectedNode?.data.lockedParams || []).includes(editingParamKey)) {
+      alert("This parameter is fixed by the predefined template.");
+      return;
+    }
+
     try {
       const parsedValue = parseParamValue(editingParamValue, editingParamType);
       const validator = selectedNode?.data.paramValidators?.[editingParamKey];
@@ -557,20 +569,49 @@ export default function App() {
           return;
         }
 
-        const normalizedNodes = graph.nodes.map((node) => ({
-          ...node,
-          data: {
-            ...node.data,
-            inputCount: Math.max(1, Number(node.data?.inputCount) || 1),
-            outputCount: Math.max(1, Number(node.data?.outputCount) || 1),
-            paramTypes: Object.fromEntries(
-              Object.entries(node.data?.params || {}).map(([key, value]) => [
-                key,
-                node.data?.paramTypes?.[key] || inferParamType(value),
-              ])
-            ),
-          },
-        }));
+        const normalizedNodes = graph.nodes.map((node) => {
+          const template = node.data?.templateKey
+            ? PREDEFINED_NODE_TEMPLATES[node.data.templateKey]
+            : null;
+          const params = template
+            ? { ...template.params, ...(node.data?.params || {}) }
+            : { ...(node.data?.params || {}) };
+
+          if (template?.lockedParams?.includes("type")) {
+            params.type = template.params.type;
+          }
+
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              params,
+              paramOrder: template
+                ? [...template.paramOrder]
+                : node.data?.paramOrder || Object.keys(params),
+              inputCount: template
+                ? template.inputCount
+                : Math.max(1, Number(node.data?.inputCount) || 1),
+              outputCount: template
+                ? template.outputCount
+                : Math.max(1, Number(node.data?.outputCount) || 1),
+              paramTypes: template
+                ? { ...template.paramTypes }
+                : Object.fromEntries(
+                    Object.entries(params).map(([key, value]) => [
+                      key,
+                      node.data?.paramTypes?.[key] || inferParamType(value),
+                    ])
+                  ),
+              paramValidators: template
+                ? { ...template.paramValidators }
+                : { ...(node.data?.paramValidators || {}) },
+              lockedParams: template
+                ? [...(template.lockedParams || [])]
+                : [...(node.data?.lockedParams || [])],
+            },
+          };
+        });
 
         setNodes(normalizedNodes);
         setEdges(graph.edges);
@@ -617,14 +658,29 @@ export default function App() {
   );
 
   return (
-    <div style={{ display: "flex", width: "100vw", height: "100vh" }}>
+    <div
+      style={{
+        display: "flex",
+        position: "fixed",
+        inset: 0,
+        width: "100vw",
+        height: "100vh",
+        margin: 0,
+        padding: 0,
+        textAlign: "left",
+      }}
+    >
       <aside
         style={{
           width: 340,
+          flex: "0 0 340px",
+          alignSelf: "stretch",
           padding: 16,
           borderRight: "1px solid #ddd",
           background: "#f7f7f7",
           boxSizing: "border-box",
+          overflowY: "auto",
+          textAlign: "left",
         }}
       >
         <h2>Graph Editor</h2>
@@ -708,16 +764,10 @@ export default function App() {
               <input
                 value={selectedNode.data.label}
                 onChange={(event) => updateNodeLabel(event.target.value)}
-                readOnly={Boolean(selectedNode.data.isPredefined)}
-                title={
-                  selectedNode.data.isPredefined
-                    ? "Predefined node labels are fixed."
-                    : undefined
-                }
                 style={{
                   width: "100%",
                   marginTop: 4,
-                  background: selectedNode.data.isPredefined ? "#eee" : "white",
+                  background: "white",
                 }}
               />
             </label>
@@ -785,7 +835,7 @@ export default function App() {
             {selectedNode.data.isPredefined && (
               <p style={{ fontSize: 12, color: "#666" }}>
                 Template: <strong>{selectedNode.data.templateKey}</strong>.
-                Parameter names, types, and ports are fixed; only values can be edited.
+                The label and parameter values can be edited. Parameter names, types, ports, and locked fields are fixed.
               </p>
             )}
 
@@ -801,6 +851,7 @@ export default function App() {
                 const displayValue =
                   type === "object" ? JSON.stringify(value) : String(value);
                 const isEditing = editingParamKey === key;
+                const isLockedParam = (selectedNode.data.lockedParams || []).includes(key);
 
                 return (
                   <div
@@ -931,9 +982,11 @@ export default function App() {
                           )}
                           <button
                             onClick={() => startEditingParameter(key)}
+                            disabled={isLockedParam}
+                            title={isLockedParam ? "This parameter is fixed by the template." : undefined}
                             style={{ fontWeight: 600 }}
                           >
-                            Edit value
+                            {isLockedParam ? "Fixed" : "Edit value"}
                           </button>
                           {!selectedNode.data.isPredefined && (
                             <button onClick={() => removeParameter(key)}>
@@ -983,7 +1036,7 @@ export default function App() {
         )}
       </aside>
 
-      <main style={{ flex: 1 }}>
+      <main style={{ flex: 1, minWidth: 0 }}>
         <ReactFlow
           nodes={nodes}
           edges={visibleEdges}
