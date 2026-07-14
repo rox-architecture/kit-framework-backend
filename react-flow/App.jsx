@@ -12,55 +12,167 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
+const PREDEFINED_NODE_TEMPLATES = {
+  save_to_file: {
+    label: "save_to_file",
+    inputCount: 1,
+    outputCount: 2,
+    params: {
+      adapter_type: "",
+      provider_bpn: "",
+      provider_url: "",
+      asset_id: "",
+    },
+    paramOrder: [
+      "adapter_type",
+      "provider_bpn",
+      "provider_url",
+      "asset_id",
+    ],
+    paramTypes: {
+      adapter_type: "string",
+      provider_bpn: "string",
+      provider_url: "string",
+      asset_id: "string",
+    },
+    paramValidators: {
+      provider_url: "url",
+    },
+  },
+};
+
 function CustomNode({ data }) {
-  const inputCount = data.inputCount ?? 1;
-  const outputCount = data.outputCount ?? 1;
+  const inputCount = Math.max(1, Number(data.inputCount) || 1);
+  const outputCount = Math.max(1, Number(data.outputCount) || 1);
   const paramOrder = data.paramOrder || Object.keys(data.params || {});
+
+  const getInputPortName = (index) =>
+    index === 0 ? "dep" : `input_${index - 1}`;
+  const getOutputPortName = (index) =>
+    index === 0 ? "dep" : `output_${index - 1}`;
 
   return (
     <div
       style={{
-        padding: 12,
+        width: 340,
+        padding: "12px 86px",
         border: "1px solid #333",
         borderRadius: 8,
         background: "white",
-        minWidth: 150,
+        boxSizing: "border-box",
         position: "relative",
+        overflow: "hidden",
       }}
     >
-      {Array.from({ length: inputCount }).map((_, index) => (
-        <Handle
-          key={`input_${index}`}
-          id={`input_${index}`}
-          type="target"
-          position={Position.Left}
-          style={{ top: `${((index + 1) / (inputCount + 1)) * 100}%` }}
-        />
-      ))}
+      {Array.from({ length: inputCount }).map((_, index) => {
+        const portName = getInputPortName(index);
+        const top = `${((index + 1) / (inputCount + 1)) * 100}%`;
 
-      <b>{data.label}</b>
+        return (
+          <div key={`input-${portName}`}>
+            <Handle
+              id={portName}
+              type="target"
+              position={Position.Left}
+              style={{ top }}
+            />
+            <span
+              style={{
+                position: "absolute",
+                left: 10,
+                top,
+                transform: "translateY(-50%)",
+                maxWidth: 72,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                fontSize: 10,
+                color: "#555",
+                pointerEvents: "none",
+              }}
+              title={portName}
+            >
+              {portName}
+            </span>
+          </div>
+        );
+      })}
+
+      <div
+        style={{
+          fontWeight: 700,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+        title={data.label}
+      >
+        {data.label}
+      </div>
 
       <div style={{ fontSize: 12, marginTop: 8 }}>
-        {paramOrder.map((key) => (
-          <div key={key}>
-            {key}: {String(data.params?.[key])}
-          </div>
-        ))}
+        {paramOrder.map((key) => {
+          const parameterValue = data.params?.[key];
+          const displayValue =
+            parameterValue !== null && typeof parameterValue === "object"
+              ? JSON.stringify(parameterValue)
+              : String(parameterValue);
+          const parameterText = `${key}: ${displayValue}`;
+
+          return (
+            <div
+              key={key}
+              style={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+              title={parameterText}
+            >
+              {parameterText}
+            </div>
+          );
+        })}
       </div>
 
       <div style={{ fontSize: 11, marginTop: 8, color: "#666" }}>
         inputs: {inputCount}, outputs: {outputCount}
       </div>
 
-      {Array.from({ length: outputCount }).map((_, index) => (
-        <Handle
-          key={`output_${index}`}
-          id={`output_${index}`}
-          type="source"
-          position={Position.Right}
-          style={{ top: `${((index + 1) / (outputCount + 1)) * 100}%` }}
-        />
-      ))}
+      {Array.from({ length: outputCount }).map((_, index) => {
+        const portName = getOutputPortName(index);
+        const top = `${((index + 1) / (outputCount + 1)) * 100}%`;
+
+        return (
+          <div key={`output-${portName}`}>
+            <Handle
+              id={portName}
+              type="source"
+              position={Position.Right}
+              style={{ top }}
+            />
+            <span
+              style={{
+                position: "absolute",
+                right: 10,
+                top,
+                transform: "translateY(-50%)",
+                maxWidth: 72,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                textAlign: "right",
+                fontSize: 10,
+                color: "#555",
+                pointerEvents: "none",
+              }}
+              title={portName}
+            >
+              {portName}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -70,6 +182,13 @@ export default function App() {
   const [edges, setEdges] = useState([]);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
+  const [newParamName, setNewParamName] = useState("");
+  const [newParamType, setNewParamType] = useState("string");
+  const [newParamValue, setNewParamValue] = useState("");
+  const [editingParamKey, setEditingParamKey] = useState(null);
+  const [editingParamType, setEditingParamType] = useState("string");
+  const [editingParamValue, setEditingParamValue] = useState("");
+  const [selectedTemplateKey, setSelectedTemplateKey] = useState("save_to_file");
 
   const nodeTypes = useMemo(() => ({ custom: CustomNode }), []);
   const selectedNode = nodes.find((node) => node.id === selectedNodeId);
@@ -77,6 +196,50 @@ export default function App() {
 
   const getParamOrder = (node) =>
     node.data.paramOrder || Object.keys(node.data.params || {});
+
+  const inferParamType = (value) => {
+    if (typeof value === "boolean") return "bool";
+    if (typeof value === "number" && Number.isInteger(value)) return "int";
+    if (value !== null && typeof value === "object") return "object";
+    return "string";
+  };
+
+  const formatParamValue = (value, type = inferParamType(value)) => {
+    if (type === "object") return JSON.stringify(value, null, 2);
+    return String(value);
+  };
+
+  const parseParamValue = (rawValue, type) => {
+    if (type === "string") return rawValue;
+
+    if (type === "int") {
+      if (!/^-?\d+$/.test(rawValue.trim())) {
+        throw new Error("Integer values must contain only whole numbers.");
+      }
+      return Number.parseInt(rawValue, 10);
+    }
+
+    if (type === "bool") {
+      if (rawValue === "true") return true;
+      if (rawValue === "false") return false;
+      throw new Error("Boolean values must be true or false.");
+    }
+
+    if (type === "object") {
+      const parsed = JSON.parse(rawValue);
+      if (parsed === null || Array.isArray(parsed) || typeof parsed !== "object") {
+        throw new Error('Object values must use JSON object syntax, for example {"key": 1}.');
+      }
+      return parsed;
+    }
+
+    return rawValue;
+  };
+
+  const createNodePosition = (currentNodes) => ({
+    x: 100 + currentNodes.length * 30,
+    y: 100 + currentNodes.length * 30,
+  });
 
   const addNode = () => {
     const id = `node-${Date.now()}`;
@@ -86,16 +249,41 @@ export default function App() {
       {
         id,
         type: "custom",
-        position: {
-          x: 100 + currentNodes.length * 30,
-          y: 100 + currentNodes.length * 30,
-        },
+        position: createNodePosition(currentNodes),
         data: {
           label: `Node ${currentNodes.length + 1}`,
           params: {},
           paramOrder: [],
+          paramTypes: {},
           inputCount: 1,
           outputCount: 1,
+        },
+      },
+    ]);
+  };
+
+  const addPredefinedNode = () => {
+    const template = PREDEFINED_NODE_TEMPLATES[selectedTemplateKey];
+    if (!template) return;
+
+    const id = `${selectedTemplateKey}-${Date.now()}`;
+
+    setNodes((currentNodes) => [
+      ...currentNodes,
+      {
+        id,
+        type: "custom",
+        position: createNodePosition(currentNodes),
+        data: {
+          label: template.label,
+          templateKey: selectedTemplateKey,
+          isPredefined: true,
+          params: { ...template.params },
+          paramOrder: [...template.paramOrder],
+          paramTypes: { ...template.paramTypes },
+          paramValidators: { ...template.paramValidators },
+          inputCount: template.inputCount,
+          outputCount: template.outputCount,
         },
       },
     ]);
@@ -112,7 +300,7 @@ export default function App() {
   };
 
   const updatePortCount = (key, value) => {
-    const nextValue = Math.max(0, Number(value));
+    const nextValue = Math.max(1, Number(value) || 1);
 
     setNodes((currentNodes) =>
       currentNodes.map((node) =>
@@ -124,40 +312,98 @@ export default function App() {
   };
 
   const addParameter = () => {
-    if (!selectedNodeId) {
-      alert("Select a node first.");
+    const key = newParamName.trim();
+    if (!selectedNodeId || !key) {
+      alert("Enter a parameter name.");
       return;
     }
 
-    const key = prompt("Parameter name");
-    if (!key) return;
+    try {
+      const parsedValue = parseParamValue(newParamValue, newParamType);
 
-    const value = prompt("Parameter value");
-    if (value === null) return;
+      setNodes((currentNodes) =>
+        currentNodes.map((node) => {
+          if (node.id !== selectedNodeId) return node;
 
-    setNodes((currentNodes) =>
-      currentNodes.map((node) => {
-        if (node.id !== selectedNodeId) return node;
+          const currentOrder = getParamOrder(node);
+          const alreadyExists = Object.prototype.hasOwnProperty.call(
+            node.data.params || {},
+            key
+          );
 
-        const currentOrder = getParamOrder(node);
-        const alreadyExists = Object.prototype.hasOwnProperty.call(
-          node.data.params || {},
-          key
-        );
-
-        return {
-          ...node,
-          data: {
-            ...node.data,
-            params: {
-              ...node.data.params,
-              [key]: value,
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              params: {
+                ...node.data.params,
+                [key]: parsedValue,
+              },
+              paramTypes: {
+                ...node.data.paramTypes,
+                [key]: newParamType,
+              },
+              paramOrder: alreadyExists ? currentOrder : [...currentOrder, key],
             },
-            paramOrder: alreadyExists ? currentOrder : [...currentOrder, key],
-          },
-        };
-      })
-    );
+          };
+        })
+      );
+
+      setNewParamName("");
+      setNewParamType("string");
+      setNewParamValue("");
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const startEditingParameter = (key) => {
+    const value = selectedNode.data.params?.[key];
+    const type = selectedNode.data.paramTypes?.[key] || inferParamType(value);
+
+    setEditingParamKey(key);
+    setEditingParamType(type);
+    setEditingParamValue(formatParamValue(value, type));
+  };
+
+  const saveEditedParameter = () => {
+    try {
+      const parsedValue = parseParamValue(editingParamValue, editingParamType);
+      const validator = selectedNode?.data.paramValidators?.[editingParamKey];
+
+      if (validator === "url") {
+        try {
+          new URL(String(parsedValue));
+        } catch {
+          throw new Error("provider_url must be a valid URL, including http:// or https://.");
+        }
+      }
+
+      setNodes((currentNodes) =>
+        currentNodes.map((node) =>
+          node.id === selectedNodeId
+            ? {
+                ...node,
+                data: {
+                  ...node.data,
+                  params: {
+                    ...node.data.params,
+                    [editingParamKey]: parsedValue,
+                  },
+                  paramTypes: {
+                    ...node.data.paramTypes,
+                    [editingParamKey]: editingParamType,
+                  },
+                },
+              }
+            : node
+        )
+      );
+
+      setEditingParamKey(null);
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const removeParameter = (keyToRemove) => {
@@ -166,13 +412,16 @@ export default function App() {
         if (node.id !== selectedNodeId) return node;
 
         const nextParams = { ...node.data.params };
+        const nextParamTypes = { ...node.data.paramTypes };
         delete nextParams[keyToRemove];
+        delete nextParamTypes[keyToRemove];
 
         return {
           ...node,
           data: {
             ...node.data,
             params: nextParams,
+            paramTypes: nextParamTypes,
             paramOrder: getParamOrder(node).filter((key) => key !== keyToRemove),
           },
         };
@@ -252,6 +501,13 @@ export default function App() {
   }, [selectedNodeId, selectedEdgeId, deleteSelectedNode, deleteSelectedEdge]);
 
   useEffect(() => {
+    setEditingParamKey(null);
+    setNewParamName("");
+    setNewParamType("string");
+    setNewParamValue("");
+  }, [selectedNodeId]);
+
+  useEffect(() => {
     const handleKeyDown = (event) => {
       const tagName = event.target.tagName;
       const isTyping = ["INPUT", "TEXTAREA", "SELECT"].includes(tagName);
@@ -301,7 +557,22 @@ export default function App() {
           return;
         }
 
-        setNodes(graph.nodes);
+        const normalizedNodes = graph.nodes.map((node) => ({
+          ...node,
+          data: {
+            ...node.data,
+            inputCount: Math.max(1, Number(node.data?.inputCount) || 1),
+            outputCount: Math.max(1, Number(node.data?.outputCount) || 1),
+            paramTypes: Object.fromEntries(
+              Object.entries(node.data?.params || {}).map(([key, value]) => [
+                key,
+                node.data?.paramTypes?.[key] || inferParamType(value),
+              ])
+            ),
+          },
+        }));
+
+        setNodes(normalizedNodes);
         setEdges(graph.edges);
         setSelectedNodeId(null);
         setSelectedEdgeId(null);
@@ -349,7 +620,7 @@ export default function App() {
     <div style={{ display: "flex", width: "100vw", height: "100vh" }}>
       <aside
         style={{
-          width: 280,
+          width: 340,
           padding: 16,
           borderRight: "1px solid #ddd",
           background: "#f7f7f7",
@@ -361,6 +632,29 @@ export default function App() {
         <button onClick={addNode} style={{ width: "100%", marginBottom: 8 }}>
           + Add Node
         </button>
+
+        <div
+          style={{
+            display: "flex",
+            gap: 6,
+            marginBottom: 8,
+          }}
+        >
+          <select
+            value={selectedTemplateKey}
+            onChange={(event) => setSelectedTemplateKey(event.target.value)}
+            style={{ flex: 1, minWidth: 0 }}
+          >
+            {Object.keys(PREDEFINED_NODE_TEMPLATES).map((templateKey) => (
+              <option key={templateKey} value={templateKey}>
+                {templateKey}
+              </option>
+            ))}
+          </select>
+          <button onClick={addPredefinedNode} style={{ flex: 1.3 }}>
+            + Add Predefined Node
+          </button>
+        </div>
 
         <button onClick={exportJson} style={{ width: "100%" }}>
           Export JSON
@@ -414,16 +708,86 @@ export default function App() {
               <input
                 value={selectedNode.data.label}
                 onChange={(event) => updateNodeLabel(event.target.value)}
-                style={{ width: "100%", marginTop: 4 }}
+                readOnly={Boolean(selectedNode.data.isPredefined)}
+                title={
+                  selectedNode.data.isPredefined
+                    ? "Predefined node labels are fixed."
+                    : undefined
+                }
+                style={{
+                  width: "100%",
+                  marginTop: 4,
+                  background: selectedNode.data.isPredefined ? "#eee" : "white",
+                }}
               />
             </label>
 
-            <button
-              onClick={addParameter}
-              style={{ width: "100%", marginTop: 12 }}
+            {!selectedNode.data.isPredefined && (
+              <>
+                <h4>Add Parameter</h4>
+
+                <input
+              value={newParamName}
+              onChange={(event) => setNewParamName(event.target.value)}
+              placeholder="Parameter name"
+              style={{ width: "100%", boxSizing: "border-box", marginBottom: 6 }}
+            />
+
+            <select
+              value={newParamType}
+              onChange={(event) => {
+                const nextType = event.target.value;
+                setNewParamType(nextType);
+                setNewParamValue(nextType === "bool" ? "true" : nextType === "object" ? "{}" : "");
+              }}
+              style={{ width: "100%", marginBottom: 6 }}
             >
-              + Add Parameter
-            </button>
+              <option value="string">string</option>
+              <option value="int">int</option>
+              <option value="bool">bool</option>
+              <option value="object">object {}</option>
+            </select>
+
+            {newParamType === "bool" ? (
+              <select
+                value={newParamValue || "true"}
+                onChange={(event) => setNewParamValue(event.target.value)}
+                style={{ width: "100%", marginBottom: 6 }}
+              >
+                <option value="true">true</option>
+                <option value="false">false</option>
+              </select>
+            ) : newParamType === "object" ? (
+              <textarea
+                value={newParamValue}
+                onChange={(event) => setNewParamValue(event.target.value)}
+                placeholder='{"key": 1}'
+                rows={4}
+                style={{ width: "100%", boxSizing: "border-box", marginBottom: 6 }}
+              />
+            ) : (
+              <input
+                type={newParamType === "int" ? "number" : "text"}
+                step={newParamType === "int" ? "1" : undefined}
+                value={newParamValue}
+                onChange={(event) => setNewParamValue(event.target.value)}
+                placeholder="Parameter value"
+                style={{ width: "100%", boxSizing: "border-box", marginBottom: 6 }}
+              />
+            )}
+
+                <button onClick={addParameter} style={{ width: "100%" }}>
+                  + Add Parameter
+                </button>
+              </>
+            )}
+
+            {selectedNode.data.isPredefined && (
+              <p style={{ fontSize: 12, color: "#666" }}>
+                Template: <strong>{selectedNode.data.templateKey}</strong>.
+                Parameter names, types, and ports are fixed; only values can be edited.
+              </p>
+            )}
 
             <h4>Parameters</h4>
 
@@ -432,15 +796,16 @@ export default function App() {
             ) : (
               selectedParamOrder.map((key, index) => {
                 const value = selectedNode.data.params?.[key];
+                const type =
+                  selectedNode.data.paramTypes?.[key] || inferParamType(value);
+                const displayValue =
+                  type === "object" ? JSON.stringify(value) : String(value);
+                const isEditing = editingParamKey === key;
 
                 return (
                   <div
                     key={key}
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: 6,
                       background: "white",
                       padding: 8,
                       marginBottom: 6,
@@ -448,25 +813,136 @@ export default function App() {
                       borderRadius: 4,
                     }}
                   >
-                    <div style={{ fontSize: 12, flex: 1 }}>
-                      <strong>{key}</strong>: {String(value)}
-                    </div>
+                    {isEditing ? (
+                      <>
+                        <div style={{ fontSize: 12, marginBottom: 6 }}>
+                          <strong>{key}</strong>
+                        </div>
 
-                    <button
-                      onClick={() => moveParameter(key, "up")}
-                      disabled={index === 0}
-                    >
-                      ↑
-                    </button>
+                        <select
+                          value={editingParamType}
+                          disabled={Boolean(selectedNode.data.isPredefined)}
+                          onChange={(event) => {
+                            const nextType = event.target.value;
+                            setEditingParamType(nextType);
+                            setEditingParamValue(
+                              nextType === "bool"
+                                ? "true"
+                                : nextType === "object"
+                                  ? "{}"
+                                  : ""
+                            );
+                          }}
+                          style={{
+                            width: "100%",
+                            marginBottom: 6,
+                            background: selectedNode.data.isPredefined ? "#eee" : "white",
+                          }}
+                        >
+                          <option value="string">string</option>
+                          <option value="int">int</option>
+                          <option value="bool">bool</option>
+                          <option value="object">object {}</option>
+                        </select>
 
-                    <button
-                      onClick={() => moveParameter(key, "down")}
-                      disabled={index === selectedParamOrder.length - 1}
-                    >
-                      ↓
-                    </button>
+                        {editingParamType === "bool" ? (
+                          <select
+                            value={editingParamValue}
+                            onChange={(event) =>
+                              setEditingParamValue(event.target.value)
+                            }
+                            style={{ width: "100%", marginBottom: 6 }}
+                          >
+                            <option value="true">true</option>
+                            <option value="false">false</option>
+                          </select>
+                        ) : editingParamType === "object" ? (
+                          <textarea
+                            value={editingParamValue}
+                            onChange={(event) =>
+                              setEditingParamValue(event.target.value)
+                            }
+                            rows={4}
+                            style={{
+                              width: "100%",
+                              boxSizing: "border-box",
+                              marginBottom: 6,
+                            }}
+                          />
+                        ) : (
+                          <input
+                            type={editingParamType === "int" ? "number" : "text"}
+                            step={editingParamType === "int" ? "1" : undefined}
+                            value={editingParamValue}
+                            onChange={(event) =>
+                              setEditingParamValue(event.target.value)
+                            }
+                            style={{
+                              width: "100%",
+                              boxSizing: "border-box",
+                              marginBottom: 6,
+                            }}
+                          />
+                        )}
 
-                    <button onClick={() => removeParameter(key)}>Remove</button>
+                        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                          <button onClick={saveEditedParameter} style={{ flex: 1 }}>
+                            Save
+                          </button>
+                          <button
+                            onClick={() => setEditingParamKey(null)}
+                            style={{ flex: 1 }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div
+                          style={{
+                            fontSize: 12,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            marginBottom: 6,
+                          }}
+                          title={`${key}: ${displayValue}`}
+                        >
+                          <strong>{key}</strong> ({type}): {displayValue}
+                        </div>
+
+                        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                          {!selectedNode.data.isPredefined && (
+                            <>
+                              <button
+                                onClick={() => moveParameter(key, "up")}
+                                disabled={index === 0}
+                              >
+                                ↑
+                              </button>
+                              <button
+                                onClick={() => moveParameter(key, "down")}
+                                disabled={index === selectedParamOrder.length - 1}
+                              >
+                                ↓
+                              </button>
+                            </>
+                          )}
+                          <button
+                            onClick={() => startEditingParameter(key)}
+                            style={{ fontWeight: 600 }}
+                          >
+                            Edit value
+                          </button>
+                          {!selectedNode.data.isPredefined && (
+                            <button onClick={() => removeParameter(key)}>
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                      </>
+                    )}
                   </div>
                 );
               })
@@ -478,7 +954,8 @@ export default function App() {
               Input count
               <input
                 type="number"
-                min="0"
+                min="1"
+                disabled={Boolean(selectedNode.data.isPredefined)}
                 value={selectedNode.data.inputCount ?? 1}
                 onChange={(event) =>
                   updatePortCount("inputCount", event.target.value)
@@ -491,7 +968,8 @@ export default function App() {
               Output count
               <input
                 type="number"
-                min="0"
+                min="1"
+                disabled={Boolean(selectedNode.data.isPredefined)}
                 value={selectedNode.data.outputCount ?? 1}
                 onChange={(event) =>
                   updatePortCount("outputCount", event.target.value)
