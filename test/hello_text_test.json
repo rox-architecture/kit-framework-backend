@@ -4,11 +4,11 @@
       "id": "node-1783457340971",
       "type": "custom",
       "position": {
-        "x": -179.55749339454283,
+        "x": -193.84578851297982,
         "y": -349.4229614329812
       },
       "data": {
-        "label": "Hello Text Test",
+        "label": "Test Container Image",
         "params": {
           "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/lea-conn/cp/protocol",
           "provider_bpn": "BPNLE56YR9OQVTA3",
@@ -25,10 +25,10 @@
           "type",
           "provider_url",
           "provider_bpn",
+          "asset_id",
           "platforms",
           "adapter_type",
           "registry_addr",
-          "asset_id",
           "image_name",
           "image_tag",
           "representation"

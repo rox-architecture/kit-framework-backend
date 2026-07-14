@@ -1,0 +1,96 @@
+{
+  "nodes": [
+    {
+      "id": "node-1784025486848",
+      "type": "custom",
+      "position": {
+        "x": 113.33425490681228,
+        "y": -430.1542100765878
+      },
+      "data": {
+        "label": "Deploy Kubernetes Env",
+        "params": {
+          "deployment_name": "testrun",
+          "replicas": "1",
+          "namespace": "default",
+          "image_name": "hellomsg",
+          "image_tag": "latest",
+          "registry": "localhost:5000",
+          "image_pull_policy": "IfNotPresent",
+          "type": "conatiner_deployment_kubernetes"
+        },
+        "paramOrder": [
+          "deployment_name",
+          "replicas",
+          "namespace",
+          "image_name",
+          "image_tag",
+          "registry",
+          "image_pull_policy",
+          "type"
+        ],
+        "inputCount": 1,
+        "outputCount": 1
+      },
+      "measured": {
+        "width": 244,
+        "height": 303
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "node-1784025511791",
+      "type": "custom",
+      "position": {
+        "x": -542.7389180960829,
+        "y": -389.04371334779603
+      },
+      "data": {
+        "label": "Test Container Image",
+        "params": {
+          "type": "data_container",
+          "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/lea-conn/cp/protocol",
+          "provider_bpn": "BPNLE56YR9OQVTA3",
+          "asset_id": "1019709d-eeca-4abf-87ec-3d9654ad4e19",
+          "platforms": "linux/amd64",
+          "adapter_type": "dlr_connector",
+          "registry_addr": "localhost:5000",
+          "image_name": "hellomsg",
+          "image_tag": "latest",
+          "representation": "archive"
+        },
+        "paramOrder": [
+          "type",
+          "provider_url",
+          "provider_bpn",
+          "asset_id",
+          "platforms",
+          "adapter_type",
+          "registry_addr",
+          "image_name",
+          "image_tag",
+          "representation"
+        ],
+        "inputCount": 1,
+        "outputCount": 1
+      },
+      "measured": {
+        "width": 511,
+        "height": 355
+      },
+      "selected": false,
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "source": "node-1784025511791",
+      "sourceHandle": "output_0",
+      "target": "node-1784025486848",
+      "targetHandle": "input_0",
+      "animated": true,
+      "id": "xy-edge__node-1784025511791output_0-node-1784025486848input_0"
+    }
+  ]
+}

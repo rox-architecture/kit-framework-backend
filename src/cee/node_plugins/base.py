@@ -59,7 +59,7 @@ class Base(ABC):
         self.OutputSpec(**self.outputs)
 
         # Note: triggering get_output before 'run' can throw an error because the outputs are not yet created
-        return self.outputs[ref]
+        return self.outputs.get(ref)
 
     @abstractmethod
     def run(self, input_data: dict | None = None) -> None:

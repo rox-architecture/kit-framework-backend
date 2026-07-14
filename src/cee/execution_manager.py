@@ -97,6 +97,10 @@ class ExecutionManager:
                         predescent_node_obj = executable_nodes[predescent_node_id]
                         item = predescent_node_obj.get_output(source_port_ref)
 
+                        # if no output is available from the source node
+                        if item is None:
+                            continue
+
                         # find out which input port this Item is connected
                         target_port_ref = e['targetHandle']
                         input_data[target_port_ref] = item
