@@ -8,7 +8,6 @@ from pydantic import TypeAdapter
 from cee.adapters_plugins.adapter import Adapter
 from cee.models.edc import Catalog, Dataset, Edr, EdrDataAddress, NegotiationInitiation
 
-FederatedCatalogAdapter = TypeAdapter(list[Catalog])
 EdrsAdapter = TypeAdapter(list[Edr])
 
 EDC_CONTEXT = {
@@ -38,13 +37,6 @@ class DlrAdapter(Adapter):
         self.session.headers.update({"Authorization": f"Bearer {self.api_key}"})
 
     @lru_cache(maxsize=1)
-    def _get_catalogs(self) -> list[Catalog]:
-        """Return the federated catalog."""
-        response = requests.get(self.catalog_url, timeout=30)
-        response.raise_for_status()
-        return FederatedCatalogAdapter.validate_python(response.json())
-
-    @lru_cache(maxsize=1)
     def _get_edrs(self) -> list[Edr]:
         """Return all EDRs."""
         endpoint = "cp/management/v3/edrs/request"
@@ -60,18 +52,31 @@ class DlrAdapter(Adapter):
         response.raise_for_status()
         return EdrsAdapter.validate_python(response.json())
 
-    # TODO: re-implement this without using the federated catalogue
-    def _get_offer(
-        self, catalogs: list[Catalog], provider_id: str, asset_id: str
-    ) -> Dataset | None:
+    def _get_catalog(self, provider_bpn: str, provider_url: str) -> Catalog:
+        """Return the catalog for the given provider."""
+        endpoint = "cp/management/v3/catalog/request"
+        url = f"{self.base_url}/{endpoint}"
+        payload = {
+            "@context": EDC_CONTEXT,
+            "counterPartyAddress": provider_url,
+            "counterPartyId": provider_bpn,
+            "protocol": "dataspace-protocol-http",
+            "querySpec": {
+                "offset": 0,
+                "limit": 10000,
+            },
+        }
+
+        response = self.session.post(url, json=payload)
+        response.raise_for_status()
+        return Catalog.model_validate(response.json())
+
+    def _get_offer(self, catalog: Catalog, asset_id: str) -> Dataset | None:
         """Return the offer for the asset with the given ID."""
-        for catalog in catalogs:
-            if catalog.participant_id != provider_id:
+        for dataset in catalog.datasets:
+            if dataset.asset_id != asset_id:
                 continue
-            for dataset in catalog.datasets:
-                if dataset.asset_id != asset_id:
-                    continue
-                return dataset
+            return dataset
         return None
 
     def _get_edr_data_address(
@@ -116,8 +121,8 @@ class DlrAdapter(Adapter):
         self, provider_bpn: str, provider_url: str, asset_id: str
     ) -> None:
         """Initiate a negotiation for the asset with the given ID."""
-        catalogs = self._get_catalogs()
-        offer = self._get_offer(catalogs, provider_bpn, asset_id)
+        catalog = self._get_catalog(provider_bpn, provider_url)
+        offer = self._get_offer(catalog, asset_id)
 
         if offer is None:
             error_message = "Offer not found"
