@@ -28,6 +28,11 @@ class DataFile(Base):
         adapter_type = self.params["adapter_type"]
         self.adapter = ADAPTER_REGISTRY[adapter_type]()
 
+    def check_validty(self) -> bool:
+        """Check whether the node is valid."""
+        asset_id = self.params["asset_id"]
+        return asset_id in self.adapter.get_negotiated_assets()
+
     # Implement DataFile node behaviour
     # the outputs are stored in `self.outputs` and retrieved via the Get method
     def run(self, input_data: dict | None = None) -> None:
