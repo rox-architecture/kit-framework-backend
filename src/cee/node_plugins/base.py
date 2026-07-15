@@ -61,7 +61,6 @@ class Base(ABC):
         # Note: triggering get_output before 'run' can throw an error because the outputs are not yet created
         return self.outputs.get(ref)
 
-
     def check_validty(self) -> bool:
         """Check whether the node is valid."""
         return True

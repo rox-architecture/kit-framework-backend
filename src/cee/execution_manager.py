@@ -77,10 +77,14 @@ class ExecutionManager:
             # Check the workflow validity (executability)
             # ----------------------------------------------------------------------
 
-            if not all(node.check_validty() for node in executable_nodes.values()):
-                error_message = "Workflow invalid"
-                raise ValueError(error_message)
-
+            # TODO: store the nodes requiring negotiation to inform the user later
+            nego_required_nodes = []
+            for node in executable_nodes.values():
+                if not node.check_validty:
+                    # TODO: for now we do not throw error message but initiate the negotiation automatically for easy experiments
+                    error_message = "Workflow invalid"
+                    # raise ValueError(error_message)
+                    
             # ----------------------------------------------------------------------
             # Execute the node objects and handle their connections
             # ----------------------------------------------------------------------
