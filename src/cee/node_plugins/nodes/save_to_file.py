@@ -8,7 +8,6 @@ from cee.node_plugins.base import Base
 class SaveToFile(Base):
     """Save to file node."""
 
-    # Predefined Output specification
     class InputSpec(BaseModel):
         """Safe to file node input spec."""
         input_0: Item
