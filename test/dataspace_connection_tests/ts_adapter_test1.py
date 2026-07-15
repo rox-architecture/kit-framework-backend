@@ -15,4 +15,4 @@ load_dotenv(Path("../..") / ".env")
 adapter = TsAdapter()
 response = adapter.transfer_data_pull("vdma-sample-aas-5")
 
-print(response.text)
+print("\n".join(response.text.splitlines()[:20]))

@@ -112,7 +112,7 @@ class TsAdapter(Adapter):
         for edr in edrs:
             if edr.asset_id != asset_id:
                 continue
-            endpoint = f"data/v2/edrs/{edr.transfer_process_id}/dataaddress?auto_refresh=false"
+            endpoint = f"data/v2/edrs/{edr.transfer_process_id}/dataaddress?auto_refresh=true"
             url = f"{self.base_url}/{endpoint}"
             response = self.session.get(url)
             return EdrDataAddress.model_validate(response.json())
@@ -153,10 +153,10 @@ class TsAdapter(Adapter):
         
         url = data_address.endpoint + (subpath or "")
         headers = {"Authorization": data_address.authorization}
-
         response = requests.request(
             method, url, headers=headers, json=payload, timeout=30
         )
 
+        # TODO: if authorization is expired then use the refresh url to get the new value and attempt again
         response.raise_for_status()
         return response
