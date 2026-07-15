@@ -216,6 +216,42 @@ const PREDEFINED_NODE_TEMPLATES = {
     },
     lockedParams: ["type"],
   },
+  send_to_url: {
+    label: "send_to_url",
+    inputCount: 2,
+    outputCount: 2,
+    params: {
+      type: "send_to_url",
+      url: "",
+      method: "POST",
+      timeout: 30.0,
+    },
+    paramOrder: [
+      "type",
+      "url",
+      "method",
+      "timeout",
+    ],
+    paramTypes: {
+      type: "string",
+      url: "string",
+      method: "string",
+      timeout: "number",
+    },
+    paramOptions: {
+      method: [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+      ],
+    },
+    paramValidators: {
+      url: "url",
+    },
+    lockedParams: ["type"],
+  },
 };
 
 function CustomNode({ data }) {

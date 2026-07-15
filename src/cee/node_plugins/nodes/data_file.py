@@ -40,6 +40,7 @@ class DataFile(Base):
         asset_id = self.params['asset_id']
         
         response = self.adapter.transfer_data_pull(asset_id)
+        
         # check against the OutputSpec schema and save into a dict
         data = Item(
             json_data={
