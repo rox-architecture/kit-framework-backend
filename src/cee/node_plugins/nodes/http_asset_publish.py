@@ -5,7 +5,7 @@ from cee.node_plugins.base import Base
 from cee.adapters_plugins.adapter_registry import ADAPTER_REGISTRY
 
 
-class AssetPublish(Base):
+class HttpAssetPublish(Base):
     """Asset Publish node."""
 
     class InputSpec(BaseModel):
@@ -16,7 +16,8 @@ class AssetPublish(Base):
         """Asset Publish node param spec."""
         adapter_type: str
         asset_id: str
-
+        connector_url: HttpUrl
+        
 
     def __init__(self, node: dict[str, Any]) -> None:
         """Initialize the instance."""
