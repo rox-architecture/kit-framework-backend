@@ -1,0 +1,68 @@
+{
+  "nodes": [
+    {
+      "id": "container_image-1784112177357",
+      "type": "custom",
+      "position": {
+        "x": 81.5,
+        "y": 76.5
+      },
+      "data": {
+        "label": "container_image",
+        "templateKey": "container_image",
+        "isPredefined": true,
+        "params": {
+          "type": "container_image",
+          "adapter_type": "dlr_connector",
+          "provider_bpn": "BPNLE56YR9OQVTA3",
+          "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/lea-conn/cp/protocol",
+          "asset_id": "1019709d-eeca-4abf-87ec-3d9654ad4e19",
+          "representation": "archive",
+          "platforms": "linux/amd64",
+          "image_name": "test5",
+          "image_tag": "ver5",
+          "registry_addr": "null"
+        },
+        "paramOrder": [
+          "type",
+          "adapter_type",
+          "provider_bpn",
+          "provider_url",
+          "asset_id",
+          "representation",
+          "platforms",
+          "image_name",
+          "image_tag",
+          "registry_addr"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "adapter_type": "string",
+          "provider_bpn": "string",
+          "provider_url": "string",
+          "asset_id": "string",
+          "representation": "string",
+          "platforms": "array",
+          "image_name": "string",
+          "image_tag": "string",
+          "registry_addr": "string"
+        },
+        "paramValidators": {
+          "provider_url": "url"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 1,
+        "outputCount": 1
+      },
+      "measured": {
+        "width": 340,
+        "height": 355
+      },
+      "selected": true,
+      "dragging": false
+    }
+  ],
+  "edges": []
+}

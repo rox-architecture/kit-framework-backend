@@ -46,8 +46,9 @@ class DataFile(Base):
         
         try:
             response = self.adapter.transfer_data_pull(asset_id)
-        except PermissionError as e:
+        except Exception as e:
             # the error caused by non-negotiated node, we negotiate automatically here for now
+            print("negotiation triggered")
             ack = self.adapter.initiate_negotiation(provider_bpn, provider_url, asset_id)
             response = self.adapter.transfer_data_pull(asset_id)
         
