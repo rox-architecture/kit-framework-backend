@@ -58,7 +58,7 @@ class DlrAdapter(Adapter):
         url = f"{self.base_url}/{endpoint}"
         payload = {
             "@context": EDC_CONTEXT,
-            "counterPartyAddress": provider_url,
+            "counterPartyAddress": str(provider_url),
             "counterPartyId": provider_bpn,
             "protocol": "dataspace-protocol-http",
             "querySpec": {
@@ -101,13 +101,14 @@ class DlrAdapter(Adapter):
             "odrl:assigner": {"@id": provider_bpn},
             "odrl:target": {"@id": offer.asset_id},
         }
+
         payload = NegotiationInitiation(
             at_context=EDC_CONTEXT,
-            counter_party_address=provider_url,
+            counter_party_address=str(provider_url),
             protocol="dataspace-protocol-http",
             policy=policy,
         ).model_dump()
-
+        
         endpoint = "cp/management/v3/edrs"
         url = f"{self.base_url}/{endpoint}"
         response = self.session.post(url, json=payload)

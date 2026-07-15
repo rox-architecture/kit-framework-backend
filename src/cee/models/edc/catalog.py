@@ -14,7 +14,8 @@ class Catalog(JsonLdEntity):
     distributions: list[Any] = Field(default_factory=list, alias="dcat:distribution")
     services: list[Any] = Field(default_factory=list, alias="dcat:service")
     participant_id: str = Field(..., alias="dspace:participantId")
-    originator: str
+    # counter_party_address: str
+    # originator: str
 
     @field_validator("datasets", "catalogs", "distributions", "services", mode="before")
     @classmethod
