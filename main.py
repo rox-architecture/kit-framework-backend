@@ -1,10 +1,15 @@
 from fastapi import FastAPI, HTTPException, Response
 import uvicorn
 from cee.sequence_generator import SequenceGenerator
-from cee.db_handler import DbHandlerWorkflow, DbHandlerExecution
+from cee.db_handler import (
+    DbHandlerExecution,
+    DbHandlerNodeExecution,
+    DbHandlerWorkflow,
+    initialize_database,
+)
 from cee.execution_manager import ExecutionManager
 from contextlib import asynccontextmanager
-from cee.schema.api_schema import *
+from cee.schema.api_schema import ExecRequestInput, GraphInput
 from dotenv import load_dotenv
 
 execution_manager = ExecutionManager()
@@ -13,9 +18,7 @@ load_dotenv()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    execution_db = DbHandlerExecution()
-    execution_db.reset()  # any execution object remained in DB from the previous app run are removed
-
+    initialize_database()
     await execution_manager.start()
 
     yield
@@ -75,7 +78,11 @@ async def register_workflow(request: GraphInput):
 
 @app.get("/workflows/show/all")
 async def get_all_workflow():
-    return {"workflow_ids": [workflow.workflow_id for workflow in DbHandlerWorkflow.get_all()]}
+    return {
+        "workflow_ids": [
+            workflow.workflow_id for workflow in DbHandlerWorkflow.get_all()
+        ]
+    }
 
 
 @app.get("/workflows/{workflow_id}")
@@ -138,12 +145,30 @@ async def get_execution(execution_id: str):
     if execution is None:
         raise HTTPException(status_code=404, detail="Execution not found")
 
-    return execution
+    return {
+        "reference_id": execution.reference_id,
+        "workflow_id": execution.workflow_id,
+        "start_at": execution.start_at,
+        "finish_at": execution.finish_at,
+        "current_state": execution.current_state,
+        "nodes": [
+            {
+                "node_id": node.node_id,
+                "current_state": node.current_state,
+                "celery_task_id": node.celery_task_id,
+                "error_message": node.error_message,
+                "queued_at": node.queued_at,
+                "start_at": node.start_at,
+                "finish_at": node.finish_at,
+            }
+            for node in DbHandlerNodeExecution.get_all(execution_id)
+        ],
+    }
 
 
 @app.delete("/execution/{execution_id}")
 async def cancel_execution(execution_id: str):
-    success = DbHandlerExecution.execution_cancelled(execution_id)
+    success = execution_manager.cancel_execution(execution_id)
 
     if not success:
         raise HTTPException(status_code=404, detail="Execution not found")

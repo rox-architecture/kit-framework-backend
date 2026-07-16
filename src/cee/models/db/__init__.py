@@ -2,6 +2,7 @@ from sqlalchemy import DDL, event
 
 from cee.models.db.base import Base
 from cee.models.db.execution import Execution
+from cee.models.db.node_execution import NodeExecution
 from cee.models.db.workflow import Workflow
 
 
@@ -40,4 +41,4 @@ event.listen(
     ),
 )
 
-__all__ = ["Base", "Execution", "Workflow"]
+__all__ = ["Base", "Execution", "NodeExecution", "Workflow"]

@@ -16,17 +16,21 @@ uv sync --all-extras
 
 ## Run
 
-First run
+Start PostgreSQL, Redis, the API, and the Celery workers:
 
 ```bash
 docker compose up --build
 ```
 
-Then run the following in another terminal
+The API is available at `http://localhost:8080`. Ready workflow nodes are sent
+to workers immediately. Set `CELERY_WORKER_CONCURRENCY` in `.env` to cap the
+number of nodes executing at once (default: 4).
 
-```bash
-python main.py
-```
+Node inputs and outputs are exchanged through the `execution_artifacts` Docker
+volume rather than Redis, so large binary values do not enter the task broker.
+The worker mounts `/var/run/docker.sock` for Docker-backed node types. Remove
+that mount if those nodes are not used; access to the Docker socket grants the
+worker host-level Docker privileges.
 
 ## Code Quality
 
