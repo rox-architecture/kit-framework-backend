@@ -6,7 +6,17 @@ import requests
 from pydantic import TypeAdapter
 
 from cee.adapters_plugins.adapter import Adapter
-from cee.models.edc import Catalog, Dataset, Edr, EdrDataAddress, NegotiationInitiation
+from cee.models.edc import (
+    AssetCreation,
+    AssetsSelector,
+    Catalog,
+    ContractCreation,
+    DataAddress,
+    Dataset,
+    Edr,
+    EdrDataAddress,
+    NegotiationInitiation,
+)
 
 EdrsAdapter = TypeAdapter(list[Edr])
 
@@ -108,11 +118,50 @@ class DlrAdapter(Adapter):
             protocol="dataspace-protocol-http",
             policy=policy,
         ).model_dump()
-        
+
         endpoint = "cp/management/v3/edrs"
         url = f"{self.base_url}/{endpoint}"
         response = self.session.post(url, json=payload)
         response.raise_for_status()
+
+    def create_asset(
+        self, asset_id: str, properties: dict[str, Any], data_address: DataAddress
+    ) -> None:
+        """Create the given asset."""
+        payload = AssetCreation(
+            at_context=EDC_CONTEXT,
+            at_id=asset_id,
+            properties=properties,
+            data_address=data_address
+        ).model_dump(exclude_none=True)
+
+        endpoint = "cp/management/v3/assets"
+        url = f"{self.base_url}/{endpoint}"
+        response = self.session.post(url, json=payload)
+        response.raise_for_status()
+
+
+    def create_contract(self, contract_id: str, policy_id: str, asset_id: str) -> None:
+        """Create the given contract."""
+        selector = AssetsSelector(
+            operand_left="https://w3id.org/edc/v0.0.1/ns/id",
+            operator="=",
+            operand_right=asset_id,
+        )
+
+        payload = ContractCreation(
+            at_context=EDC_CONTEXT,
+            at_id=contract_id,
+            access_policy_id=policy_id,
+            contract_policy_id=policy_id,
+            assets_selector=selector
+        ).model_dump(exclude_none=True)
+
+        endpoint = "cp/management/v3/contractdefinitions"
+        url = f"{self.base_url}/{endpoint}"
+        response = self.session.post(url, json=payload)
+        response.raise_for_status()
+
 
     def get_negotiated_assets(self) -> set[str]:
         """Return the IDs of all negotiated assets."""
