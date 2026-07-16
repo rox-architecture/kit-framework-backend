@@ -1,0 +1,68 @@
+{
+  "nodes": [
+    {
+      "id": "container_image-1784191753780",
+      "type": "custom",
+      "position": {
+        "x": 72,
+        "y": 19
+      },
+      "data": {
+        "label": "container_image",
+        "templateKey": "container_image",
+        "isPredefined": true,
+        "params": {
+          "type": "container_image",
+          "adapter_type": "ts_connector",
+          "provider_bpn": "BPNL000000000GUC",
+          "provider_url": "https://testin-1dfadd3f-de.rox-test.lila.dih.telekom.com",
+          "asset_id": "3f11e742-030b-4746-b4ab-801cd429a1a8",
+          "representation": "archive",
+          "platforms": "linux/arm64",
+          "image_name": "TScontainerTest",
+          "image_tag": "99",
+          "registry_addr": "localhost:5000"
+        },
+        "paramOrder": [
+          "type",
+          "adapter_type",
+          "provider_bpn",
+          "provider_url",
+          "asset_id",
+          "representation",
+          "platforms",
+          "image_name",
+          "image_tag",
+          "registry_addr"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "adapter_type": "string",
+          "provider_bpn": "string",
+          "provider_url": "string",
+          "asset_id": "string",
+          "representation": "string",
+          "platforms": "array",
+          "image_name": "string",
+          "image_tag": "string",
+          "registry_addr": "string"
+        },
+        "paramValidators": {
+          "provider_url": "url"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 1,
+        "outputCount": 1
+      },
+      "measured": {
+        "width": 340,
+        "height": 355
+      },
+      "selected": true,
+      "dragging": false
+    }
+  ],
+  "edges": []
+}

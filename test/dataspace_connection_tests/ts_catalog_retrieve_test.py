@@ -24,9 +24,9 @@ headers = {
     "X-Api-Key": f"{api_key}"
 }
 
-provider_bpn = "BPNL000000000065"
-provider_endpoint = "https://t-syst-9e114f1c-de.rox-test.lila.dih.telekom.com"
-asset_id = "CI_test_03"
+provider_bpn = "BPNL000000000GUC"
+provider_endpoint = "https://testin-1dfadd3f-de.rox-test.lila.dih.telekom.com"
+asset_id = ""
 
 """Payload"""
 payload = {
@@ -64,6 +64,7 @@ response = requests.post(
 )
 
 print(full_url)
+print(provider_endpoint)
 print(response.status_code)
 print(response.headers)
 try:

@@ -64,7 +64,7 @@ class TsAdapter(Adapter):
             "@type": "CatalogRequest",
             "protocol": "dataspace-protocol-http",
             "counterPartyId": provider_id,
-            "counterPartyAddress": provider_url + "/api/v1/dsp",
+            "counterPartyAddress": f"{str(provider_url).rstrip('/')}/api/v1/dsp",
             "querySpec": {
                 "offset": 0,
                 "limit": 20000,
@@ -76,11 +76,12 @@ class TsAdapter(Adapter):
 
         # response is the catalog
         response = self.session.post(url, json=payload)
+        response.raise_for_status()
 
         for dataset in response.json()['dcat:dataset']:
             if dataset["@id"] == asset_id:
                 return Dataset.model_validate(dataset)
-            
+        
         return None
 
     def _initiate_negotiation(
@@ -94,10 +95,10 @@ class TsAdapter(Adapter):
         payload = NegotiationInitiation(
             at_type="ContractRequest",
             at_context=EDC_CONTEXT,
-            counter_party_address=provider_url,
+            counter_party_address=f"{str(provider_url).rstrip('/')}/api/v1/dsp",
             protocol="dataspace-protocol-http",
             policy=policy,
-        ).model_dump()
+        ).model_dump(by_alias=True, exclude_none=True)
 
         endpoint = "data/v2/edrs"
         url = f"{self.base_url}/{endpoint}"
@@ -127,12 +128,12 @@ class TsAdapter(Adapter):
     ) -> None:
         """Initiate a negotiation for the asset with the given ID."""
         offer = self._get_offer(provider_url, provider_bpn, asset_id)
-
+    
         if offer is None:
             error_message = "Offer not found"
             raise PermissionError(error_message)
-
         self._initiate_negotiation(offer, provider_bpn, provider_url)
+        
 
     # TODO: edr token expiration problem needs to be resolved 
     def transfer_data_pull(
