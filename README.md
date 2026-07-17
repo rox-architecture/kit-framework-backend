@@ -117,7 +117,7 @@ Run `mypy` for type checking via
 - [Running Example 1 - dataspace asset local save and management ](./docs/running_example1.md)
 - [Running Example 2 - dataspace asset container image build](./docs/running_example2.md)
 - [Running Example 3 - dataspace asset container image build and kubernetes deployment](./docs/running_example3.md)
+- [Asset creation - how to create assets and contracts](./docs/asset_creation_dlr_dataspace.pdf)
 
 ## Important Notes:
 
-- 

@@ -1,6 +1,6 @@
 # Workflow Graph Specification
 
-Each workflow is a directed acyclic graph (DAG).
+Each workflow is a directed acyclic graph (DAG). Consequently, any loop is not allowed in the workflow.
 
 A workflow graph is: 
 ```json
@@ -122,17 +122,17 @@ Because, `json_data` is only the description of the data.
 
 ## Already Implemented Nodes
 
-Technically, what's behind the execution of a node is a python script. 
-More precisely, depending on the node type, a specific python method is called and executed.
-Therefore, it is easy for users to add a new node type, and implement the node's behaviour.
+Technically, what's behind the node execution is a python script. 
+More precisely, depending on the node type, a specific python method is called.
+It is inteded to allow users to easily introduce a new node type and implement the behaviour.
 
 However, for easier usage, we already have a set of node types already implemented.
-These already cover typical functionality needed to use the digital ecosystem via the dataspace.
+These already cover typical functionalities needed to use the digital ecosystem.
 The list of available nodes are explained in [node_list.md](node_list.md)
 
 ## Workflow Example
 
-If you are curious about how the workflow graph looks like in JSON, consider the below example (image vs. JSON).
+If you are curious about how the workflow graph looks like in JSON, consider the below example, and compare the image vs. JSON.
 
 JSON: [graph json](./../test/running_example1.json)
 
