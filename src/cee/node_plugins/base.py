@@ -70,7 +70,7 @@ class Base(ABC):
         return True
 
     @abstractmethod
-    def run(self, input_data: dict | None = None) -> None:
+    def run(self, config: dict, input_data: dict | None = None) -> None:
         """Run the node."""
         # input_data must match InputSpec
         # params must match ParamSpec

@@ -169,7 +169,13 @@ async def cancel_execution(execution_id: str):
 # Supplementary Endpoints
 # --------------------------------------------------------------------
 
-
+@app.post("/config")
+async def cancel_execution(config: ConfigChange):
+    configuration = await execution_manager.set_config(config.model_dump(exclude_none=True))
+    return {
+        "message": "Configuration changed",
+        "configuration": configuration
+    }
 
 if __name__ == "__main__":
     uvicorn.run(

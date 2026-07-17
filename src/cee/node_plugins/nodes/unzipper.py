@@ -23,7 +23,7 @@ class Unzipper(Base):
         """Initialize the instance."""
         super().__init__(node)
 
-    def run(self, input_data: dict | None = None) -> None:
+    def run(self, config: dict, input_data: dict | None = None) -> None:
         print(f"[Node {self.node_id}] Execution started")
 
         """Run the node."""

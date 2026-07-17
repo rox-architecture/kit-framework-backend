@@ -14,10 +14,14 @@ class ExecutionManager:
         self._running = False
         self._running_tasks: dict[str, asyncio.Task] = {}  # for the worker cancellation
 
-        self.parameters = {}
-        # later, we can add various options to the execution core
-        # E.g., "temporary_files": True | False ==> the output of all the nodes are wrapped into list(Item) and saved into a file instead of in the memory.
-        # E.g., "parallelisation": True | False ==> the execution of nodes in the same generation can be executed in parallel. Further information will be required.
+        # TODO: add more configuration aspects
+        self.configurations = {
+            "auto_nego": False, # automatically make required negotiations
+        } 
+
+    async def set_config(self, config_changes):
+        self.configurations.update(config_changes)
+        return self.configurations
 
     async def start(self) -> None:
         """Start the manager."""
@@ -78,13 +82,12 @@ class ExecutionManager:
             # ----------------------------------------------------------------------
 
             # TODO: store the nodes requiring negotiation to inform the user later
-            nego_required_nodes = []
-            for node in executable_nodes.values():
-                if not node.check_validty:
-                    # TODO: for now we do not throw error message but initiate the negotiation automatically for easy experiments
-                    error_message = "Workflow invalid"
-                    # raise ValueError(error_message)
-                    print(error_message)
+            # nego_required_nodes = []
+            # if not self.configurations['auto_nego']:
+            #     for node in executable_nodes.values():
+            #         if not node.check_validty():
+            #             error_message = "Negotiation is required while auto-nego is disabled"
+            #             raise ValueError(error_message)
                     
             # ----------------------------------------------------------------------
             # Execute the node objects and handle their connections
@@ -119,7 +122,7 @@ class ExecutionManager:
                         input_data[target_port_ref] = item
 
                     # execute the node in a non-blocking way
-                    await asyncio.to_thread(node_obj.run, input_data)
+                    await asyncio.to_thread(node_obj.run, self.configurations, input_data)
 
 
         except asyncio.CancelledError:

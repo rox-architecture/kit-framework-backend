@@ -42,7 +42,7 @@ class ServiceFile(Base):
 
     # Implement DataFile node behaviour
     # the outputs are stored in `self.outputs` and retrieved via the Get method
-    def run(self, input_data: dict | None = None) -> None:
+    def run(self, config: dict, input_data: dict | None = None) -> None:
         """Run the ndoe."""
         print(f"[Node {self.node_id}] Execution started")
 
@@ -59,13 +59,16 @@ class ServiceFile(Base):
                 asset_id, method=method, subpath=subpath, payload=payload
             )
         except Exception:
-            # TODO: to remove: automatic negotiation for easy testing
-            print("negotiation triggered")
-            ack = self.adapter.initiate_negotiation(
-                provider_bpn, provider_url, asset_id
-            )
-            response = self.adapter.transfer_data_pull(asset_id)
-
+            if config['auto_nego']: 
+                print("automatic negotiation is triggered")
+                ack = self.adapter.initiate_negotiation(
+                    provider_bpn, provider_url, asset_id
+                )
+                response = self.adapter.transfer_data_pull(asset_id)
+            else:
+                raise PermissionError("Negotiation required and auto-nego is disabled")
+            
+            
         data = Item(
             json_data={
                 "content_type": response.headers.get("content-type"),

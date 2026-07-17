@@ -198,9 +198,10 @@ class DlrAdapter(Adapter):
 
         url = data_address.endpoint + (subpath or "")
         headers = {"Authorization": data_address.authorization}
-
+        
         response = requests.request(
             method, url, headers=headers, json=payload, timeout=30
         )
+
         response.raise_for_status()
         return response

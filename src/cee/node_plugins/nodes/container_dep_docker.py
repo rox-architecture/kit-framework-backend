@@ -19,7 +19,7 @@ class ContainerDeploymentDocker(Base):
         super().__init__(node)
 
 
-    def run(self, input_data: dict | None = None) -> None:
+    def run(self, config: dict, input_data: dict | None = None) -> None:
         """Run the ndoe."""
         print(f"[Node {self.node_id}] Execution started")
 

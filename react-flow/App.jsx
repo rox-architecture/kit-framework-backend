@@ -9,6 +9,7 @@ import {
   addEdge,
   applyNodeChanges,
   applyEdgeChanges,
+  useUpdateNodeInternals,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -99,12 +100,12 @@ const PREDEFINED_NODE_TEMPLATES = {
     },
     lockedParams: ["type"],
   },
-  data_file: {
+  ds_data_file: {
     label: "data_file",
     inputCount: 1,
     outputCount: 2,
     params: {
-      type: "data_file",
+      type: "ds_data_file",
       adapter_type: "",
       provider_bpn: "",
       provider_url: "",
@@ -129,12 +130,12 @@ const PREDEFINED_NODE_TEMPLATES = {
     },
     lockedParams: ["type"],
   },
-  container_image: {
+  ds_container: {
     label: "container_image",
     inputCount: 1,
     outputCount: 1,
     params: {
-      type: "container_image",
+      type: "ds_container",
       adapter_type: "",
       provider_bpn: "",
       provider_url: "",
@@ -254,15 +255,54 @@ const PREDEFINED_NODE_TEMPLATES = {
   },
 };
 
-function CustomNode({ data }) {
+const getInputPortName = (index) =>
+  index === 0 ? "dep" : `input_${index - 1}`;
+
+const getOutputPortName = (index) =>
+  index === 0 ? "dep" : `output_${index - 1}`;
+
+const getTargetHandleId = (portName) => `target:${portName}`;
+const getSourceHandleId = (portName) => `source:${portName}`;
+
+const stripHandleDirection = (handleId) => {
+  if (typeof handleId !== "string") return handleId;
+  return handleId.replace(/^(source|target):/, "");
+};
+
+const normalizeEdgeForCanvas = (edge) => ({
+  ...edge,
+  sourceHandle:
+    edge.sourceHandle == null
+      ? edge.sourceHandle
+      : edge.sourceHandle.startsWith("source:")
+        ? edge.sourceHandle
+        : getSourceHandleId(edge.sourceHandle),
+  targetHandle:
+    edge.targetHandle == null
+      ? edge.targetHandle
+      : edge.targetHandle.startsWith("target:")
+        ? edge.targetHandle
+        : getTargetHandleId(edge.targetHandle),
+});
+
+const serializeGraph = (nodes, edges) => ({
+  nodes,
+  edges: edges.map((edge) => ({
+    ...edge,
+    sourceHandle: stripHandleDirection(edge.sourceHandle),
+    targetHandle: stripHandleDirection(edge.targetHandle),
+  })),
+});
+
+function CustomNode({ id, data }) {
   const inputCount = Math.max(1, Number(data.inputCount) || 1);
   const outputCount = Math.max(1, Number(data.outputCount) || 1);
   const paramOrder = data.paramOrder || Object.keys(data.params || {});
+  const updateNodeInternals = useUpdateNodeInternals();
 
-  const getInputPortName = (index) =>
-    index === 0 ? "dep" : `input_${index - 1}`;
-  const getOutputPortName = (index) =>
-    index === 0 ? "dep" : `output_${index - 1}`;
+  useEffect(() => {
+    updateNodeInternals(id);
+  }, [id, inputCount, outputCount, updateNodeInternals]);
 
   return (
     <div
@@ -284,7 +324,7 @@ function CustomNode({ data }) {
         return (
           <div key={`input-${portName}`}>
             <Handle
-              id={portName}
+              id={getTargetHandleId(portName)}
               type="target"
               position={Position.Left}
               style={{ top }}
@@ -359,7 +399,7 @@ function CustomNode({ data }) {
         return (
           <div key={`output-${portName}`}>
             <Handle
-              id={portName}
+              id={getSourceHandleId(portName)}
               type="source"
               position={Position.Right}
               style={{ top }}
@@ -402,6 +442,8 @@ export default function App() {
   const [editingParamType, setEditingParamType] = useState("string");
   const [editingParamValue, setEditingParamValue] = useState("");
   const [selectedTemplateKey, setSelectedTemplateKey] = useState("save_to_file");
+  const [isRunning, setIsRunning] = useState(false);
+  const [runMessage, setRunMessage] = useState("");
 
   const nodeTypes = useMemo(() => ({ custom: CustomNode }), []);
   const selectedNode = nodes.find((node) => node.id === selectedNodeId);
@@ -747,8 +789,99 @@ export default function App() {
     };
   }, [deleteSelected]);
 
+  const runWorkflow = async () => {
+    if (isRunning) return;
+
+    setIsRunning(true);
+    setRunMessage("Creating workflow...");
+
+    try {
+      const graphJson = serializeGraph(nodes, edges);
+      const randomNumber = Math.floor(Math.random() * 1000) + 1;
+      const workflowName = `my-workflow${randomNumber}`;
+
+      const createResponse = await fetch("http://localhost:8080/workflows", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          workflow_name: workflowName,
+          graph_json: graphJson,
+        }),
+      });
+
+      const createResponseText = await createResponse.text();
+      let createResult;
+
+      try {
+        createResult = createResponseText ? JSON.parse(createResponseText) : {};
+      } catch {
+        throw new Error(
+          `Workflow creation returned invalid JSON (${createResponse.status}): ${createResponseText}`
+        );
+      }
+
+      if (!createResponse.ok) {
+        throw new Error(
+          createResult.detail ||
+            createResult.message ||
+            `Workflow creation failed with status ${createResponse.status}.`
+        );
+      }
+
+      const workflowId = createResult.workflow_id;
+      if (!workflowId) {
+        throw new Error("The workflow response did not include workflow_id.");
+      }
+
+      setRunMessage("Requesting execution...");
+
+      const executionResponse = await fetch(
+        "http://localhost:8080/execution/request",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ workflow_id: workflowId }),
+        }
+      );
+
+      const executionResponseText = await executionResponse.text();
+      let executionResult = {};
+
+      if (executionResponseText) {
+        try {
+          executionResult = JSON.parse(executionResponseText);
+        } catch {
+          executionResult = { raw_response: executionResponseText };
+        }
+      }
+
+      if (!executionResponse.ok) {
+        throw new Error(
+          executionResult.detail ||
+            executionResult.message ||
+            executionResult.raw_response ||
+            `Execution request failed with status ${executionResponse.status}.`
+        );
+      }
+
+      console.log("Workflow created:", createResult);
+      console.log("Execution requested:", executionResult);
+      setRunMessage(`Execution requested: ${workflowId}`);
+    } catch (error) {
+      console.error(error);
+      setRunMessage(`Error: ${error.message}`);
+      alert(error.message);
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
   const exportJson = () => {
-    const graph = { nodes, edges };
+    const graph = serializeGraph(nodes, edges);
     const json = JSON.stringify(graph, null, 2);
     console.log(json);
 
@@ -823,7 +956,7 @@ export default function App() {
         });
 
         setNodes(normalizedNodes);
-        setEdges(graph.edges);
+        setEdges(graph.edges.map(normalizeEdgeForCanvas));
         setSelectedNodeId(null);
         setSelectedEdgeId(null);
 
@@ -848,8 +981,20 @@ export default function App() {
   }, []);
 
   const onConnect = useCallback((connection) => {
+    if (!connection.sourceHandle || !connection.targetHandle) {
+      console.error("Connection is missing a source or target handle.", connection);
+      return;
+    }
+
     setEdges((currentEdges) =>
-      addEdge({ ...connection, animated: true }, currentEdges)
+      addEdge(
+        {
+          ...connection,
+          id: `edge-${connection.source}-${connection.sourceHandle}-${connection.target}-${connection.targetHandle}-${Date.now()}`,
+          animated: true,
+        },
+        currentEdges
+      )
     );
   }, []);
 
@@ -1245,7 +1390,55 @@ export default function App() {
         )}
       </aside>
 
-      <main style={{ flex: 1, minWidth: 0 }}>
+      <main style={{ flex: 1, minWidth: 0, position: "relative" }}>
+        <div
+          style={{
+            position: "absolute",
+            top: 16,
+            right: 16,
+            zIndex: 10,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+            gap: 6,
+          }}
+        >
+          <button
+            onClick={runWorkflow}
+            disabled={isRunning}
+            title="Create and execute workflow"
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: "50%",
+              border: "none",
+              background: isRunning ? "#86c98e" : "#22a447",
+              color: "white",
+              fontSize: 22,
+              cursor: isRunning ? "not-allowed" : "pointer",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.25)",
+            }}
+          >
+            {isRunning ? "…" : "▶"}
+          </button>
+
+          {runMessage && (
+            <div
+              style={{
+                maxWidth: 320,
+                padding: "6px 9px",
+                borderRadius: 4,
+                background: "rgba(255, 255, 255, 0.95)",
+                border: "1px solid #ddd",
+                fontSize: 12,
+                overflowWrap: "anywhere",
+              }}
+            >
+              {runMessage}
+            </div>
+          )}
+        </div>
+
         <ReactFlow
           nodes={nodes}
           edges={visibleEdges}
