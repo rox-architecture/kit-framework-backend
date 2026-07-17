@@ -1,18 +1,37 @@
-# canvas-execution-engine
+# Dataspace Workflow Execution Engine 
 
-Execution engine for the canvas.
+This repository contains ww
+
 
 ## Setup (Development)
 
-Install either with `pip` or `uv`
+Install either with `pip` or `uv`. 
+
+```bash
+uv sync --all-extras
+```
 
 ```bash
 pip install -e .[dev]
 ```
 
+Next, prepare the `.env` file.
+
 ```bash
-uv sync --all-extras
+cp .env.example .env
 ```
+
+Open the `.env` file and specify your api key to access the dataspace.
+```
+BASE_URL_DLR_CONNECTOR=...
+API_KEY_DLR_CONNECTOR=...
+```
+
+### Optional: Workflow Graph Editor GUI
+
+Users can create and edit workflow graphs easily by using the pvodied GUI.
+The GUI is  is currently demo
+
 
 ## Run
 
@@ -28,6 +47,12 @@ Then run the following in another terminal
 python main.py
 ```
 
+or using `uv`, 
+
+```bash
+uv run python main.py
+```
+
 ## Code Quality
 
 Run `ruff` for formatting and linting via
@@ -40,28 +65,13 @@ ruff check
 Run `mypy` for type checking via
 
 
+
+
 # Example Walk Through
 
 Before we start, setup the graph editor GUI [here](https://gitlab.dlr.de/ki-dataspace/canvas-execution-engine/-/blob/main/react-flow/README.md?ref_type=heads)
 
-### 1. Prepare .env file
 
-```bash
-cp .env.example .env
-```
-
-In the `.env` file, complete two variables, which are needed to access the dataspace API.
-```
-BASE_URL_DLR_CONNECTOR=...
-API_KEY_DLR_CONNECTOR=...
-```
-- BASE_URL_DLR_CONNECTOR looks like `https://vision-x-api.base-x-ecosystem.org/connectors/jin-conn`
-- API_KEY_DLR_CONNECTOR looks like `sk-...`
-
-Our engine needs to run again to load the environment variables.
-```bash
-python main.py
-```
 
 ### 2. Check the example workflow graph
 
