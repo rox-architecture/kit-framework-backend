@@ -1,6 +1,7 @@
-# Dataspace Workflow Engine
+# Dataspace Workflow Execution Engine 
 
-Execution engine for the canvas.
+This repository contains ww
+
 
 ## Setup (Development)
 
@@ -25,6 +26,11 @@ Open the `.env` file and specify your api key to access the dataspace.
 BASE_URL_DLR_CONNECTOR=...
 API_KEY_DLR_CONNECTOR=...
 ```
+
+### Optional: Workflow Graph Editor GUI
+
+Users can create and edit workflow graphs easily by using the pvodied GUI.
+The GUI is  is currently demo
 
 
 ## Run
@@ -59,19 +65,13 @@ ruff check
 Run `mypy` for type checking via
 
 
+
+
 # Example Walk Through
 
 Before we start, setup the graph editor GUI [here](https://gitlab.dlr.de/ki-dataspace/canvas-execution-engine/-/blob/main/react-flow/README.md?ref_type=heads)
 
-### 1. Prepare .env file
 
-
-
-
-Our engine needs to run again to load the environment variables.
-```bash
-python main.py
-```
 
 ### 2. Check the example workflow graph
 
