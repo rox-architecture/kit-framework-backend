@@ -1,0 +1,247 @@
+{
+  "nodes": [
+    {
+      "id": "node-1783344464430",
+      "type": "custom",
+      "position": {
+        "x": -218.68690095995103,
+        "y": -156.9919900508629
+      },
+      "data": {
+        "label": "Wine Quality Dataset for White Wine",
+        "params": {
+          "type": "data_file",
+          "adapter_type": "dlr_connector",
+          "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/jin-conn/cp/protocol",
+          "provider_bpn": "BPNLNWF14QKMQ9QE",
+          "asset_id": "Wine Quality Dataset for White Wine"
+        },
+        "paramOrder": [
+          "type",
+          "adapter_type",
+          "provider_url",
+          "provider_bpn",
+          "asset_id"
+        ],
+        "inputCount": 1,
+        "outputCount": 1,
+        "paramTypes": {
+          "type": "string",
+          "adapter_type": "string",
+          "provider_url": "string",
+          "provider_bpn": "string",
+          "asset_id": "string"
+        },
+        "paramValidators": {},
+        "lockedParams": []
+      },
+      "measured": {
+        "width": 340,
+        "height": 225
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "node-1783344667589",
+      "type": "custom",
+      "position": {
+        "x": 299.21125704152934,
+        "y": -93.46589906291105
+      },
+      "data": {
+        "label": "Save To File",
+        "params": {
+          "type": "save_to_file",
+          "file_path": "download/white_wine.csv"
+        },
+        "paramOrder": [
+          "type",
+          "file_path"
+        ],
+        "inputCount": 1,
+        "outputCount": 1,
+        "paramTypes": {
+          "type": "string",
+          "file_path": "string"
+        },
+        "paramValidators": {},
+        "lockedParams": []
+      },
+      "measured": {
+        "width": 340,
+        "height": 147
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "node-1783368885402",
+      "type": "custom",
+      "position": {
+        "x": -225.56932555412482,
+        "y": 170.88114458317875
+      },
+      "data": {
+        "label": "Wine Quality Dataset for Red Wine",
+        "params": {
+          "type": "data_file",
+          "adapter_type": "dlr_connector",
+          "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/jin-conn/cp/protocol",
+          "provider_bpn": "BPNLNWF14QKMQ9QE",
+          "asset_id": "Wine Quality Dataset for Red Wine"
+        },
+        "paramOrder": [
+          "type",
+          "adapter_type",
+          "provider_url",
+          "provider_bpn",
+          "asset_id"
+        ],
+        "inputCount": 1,
+        "outputCount": 1,
+        "paramTypes": {
+          "type": "string",
+          "adapter_type": "string",
+          "provider_url": "string",
+          "provider_bpn": "string",
+          "asset_id": "string"
+        },
+        "paramValidators": {},
+        "lockedParams": []
+      },
+      "measured": {
+        "width": 340,
+        "height": 225
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "node-1783369036602",
+      "type": "custom",
+      "position": {
+        "x": 294.3362704756523,
+        "y": 153.98148369191532
+      },
+      "data": {
+        "label": "Save To File",
+        "params": {
+          "type": "save_to_file",
+          "file_path": "download/red_wine.csv"
+        },
+        "paramOrder": [
+          "type",
+          "file_path"
+        ],
+        "inputCount": 1,
+        "outputCount": 1,
+        "paramTypes": {
+          "type": "string",
+          "file_path": "string"
+        },
+        "paramValidators": {},
+        "lockedParams": []
+      },
+      "measured": {
+        "width": 340,
+        "height": 147
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "zipper-1784275276961",
+      "type": "custom",
+      "position": {
+        "x": 776.4343541483232,
+        "y": 12.941094630340956
+      },
+      "data": {
+        "label": "zipper",
+        "templateKey": "zipper",
+        "isPredefined": true,
+        "params": {
+          "type": "zipper",
+          "target_directory": "download",
+          "output_path": "download/dataset.zip"
+        },
+        "paramOrder": [
+          "type",
+          "target_directory",
+          "output_path"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "target_directory": "string",
+          "output_path": "string"
+        },
+        "paramValidators": {
+          "target_directory": "path",
+          "output_path": "path"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 1,
+        "outputCount": 1
+      },
+      "measured": {
+        "width": 340,
+        "height": 173
+      },
+      "selected": true,
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "source": "node-1783344464430",
+      "sourceHandle": "output_0",
+      "target": "node-1783344667589",
+      "targetHandle": "input_0",
+      "animated": true,
+      "id": "xy-edge__node-1783344464430output_0-node-1783344667589input_0"
+    },
+    {
+      "source": "node-1783368885402",
+      "sourceHandle": "output_0",
+      "target": "node-1783369036602",
+      "targetHandle": "input_0",
+      "animated": true,
+      "id": "xy-edge__node-1783368885402output_0-node-1783369036602input_0"
+    },
+    {
+      "source": "node-1783344464430",
+      "sourceHandle": "dep",
+      "target": "node-1783344667589",
+      "targetHandle": "dep",
+      "animated": true,
+      "id": "xy-edge__node-1783344464430dep-node-1783344667589dep"
+    },
+    {
+      "source": "node-1783368885402",
+      "sourceHandle": "dep",
+      "target": "node-1783369036602",
+      "targetHandle": "dep",
+      "animated": true,
+      "id": "xy-edge__node-1783368885402dep-node-1783369036602dep"
+    },
+    {
+      "source": "node-1783344667589",
+      "sourceHandle": "dep",
+      "target": "zipper-1784275276961",
+      "targetHandle": "dep",
+      "animated": true,
+      "id": "xy-edge__node-1783344667589dep-zipper-1784275276961dep"
+    },
+    {
+      "source": "node-1783369036602",
+      "sourceHandle": "dep",
+      "target": "zipper-1784275276961",
+      "targetHandle": "dep",
+      "animated": true,
+      "id": "xy-edge__node-1783369036602dep-zipper-1784275276961dep"
+    }
+  ]
+}

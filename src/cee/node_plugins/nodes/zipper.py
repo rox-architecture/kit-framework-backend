@@ -1,8 +1,8 @@
 from pydantic import BaseModel
-from cee.schema.execution_schema import Item
 from pathlib import Path
 from cee.node_plugins.base import Base
 import shutil
+import tempfile
 
 class Zipper(Base):
     """Zipper node."""
@@ -21,7 +21,7 @@ class Zipper(Base):
         
         # read parameters
         target_directory = Path(self.params["target_directory"])
-        output_path = self.params["output_path"]
+        output_path = Path(self.params["output_path"])
 
         if not target_directory.is_dir():
             raise NotADirectoryError(
@@ -34,10 +34,21 @@ class Zipper(Base):
         # create parent directories
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        shutil.make_archive(
-            base_name=str(output_path.with_suffix("")),
-            format="zip",
-            root_dir=str(target_directory),
-        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            temporary_base = Path(tmpdir) / "archive"
 
+            temporary_archive = Path(
+                shutil.make_archive(
+                    base_name=str(temporary_base),
+                    format="zip",
+                    root_dir=str(target_directory),
+                )
+            )
+
+            shutil.move(
+                str(temporary_archive),
+                str(output_path),
+            )
+
+        print(f"[Node {self.node_id}] Created archive: {output_path}")
         self.finished = True

@@ -84,6 +84,7 @@ class ExecutionManager:
                     # TODO: for now we do not throw error message but initiate the negotiation automatically for easy experiments
                     error_message = "Workflow invalid"
                     # raise ValueError(error_message)
+                    print(error_message)
                     
             # ----------------------------------------------------------------------
             # Execute the node objects and handle their connections
