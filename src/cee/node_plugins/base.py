@@ -49,6 +49,10 @@ class Base(ABC):
     def get_param_spec(cls):
         """Return the param spec."""
         return cls.ParamSpec.model_fields
+    
+    # @abstractmethod
+    # def get_requirements(self):
+    #     ...
 
     def set_output(self, port: int, item: Item) -> None:
         reference = f'output_{port}'
