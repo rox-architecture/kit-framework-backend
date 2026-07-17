@@ -12,6 +12,10 @@ class SaveToFile(Base):
         """Safe to file node input spec."""
         input_0: Item
 
+    # Output is always a list of Items
+    class OutputSpec(BaseModel):
+        pass
+
     class ParamSpec(BaseModel):
         """Safe to file node param spec."""
         file_path: Path

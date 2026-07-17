@@ -14,6 +14,14 @@ import zipfile
 class ContainerImage(Base):
     """Data container node."""
 
+    # Input is always a list of Items
+    class InputSpec(BaseModel):
+        pass
+
+    # Output is always a list of Items
+    class OutputSpec(BaseModel):
+        pass
+
     class ParamSpec(BaseModel):
         """Data file node param spec."""
         adapter_type: str

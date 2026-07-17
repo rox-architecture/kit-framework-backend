@@ -4,13 +4,13 @@
       "id": "node-1783344464430",
       "type": "custom",
       "position": {
-        "x": -218.68690095995103,
-        "y": -156.9919900508629
+        "x": -223.91020433972778,
+        "y": -199.648967652373
       },
       "data": {
-        "label": "Wine Quality Dataset for White Wine",
+        "label": "White Wine Dataset",
         "params": {
-          "type": "data_file",
+          "type": "ds_data_file",
           "adapter_type": "dlr_connector",
           "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/jin-conn/cp/protocol",
           "provider_bpn": "BPNLNWF14QKMQ9QE",
@@ -24,7 +24,7 @@
           "asset_id"
         ],
         "inputCount": 1,
-        "outputCount": 1,
+        "outputCount": 2,
         "paramTypes": {
           "type": "string",
           "adapter_type": "string",
@@ -59,7 +59,7 @@
           "type",
           "file_path"
         ],
-        "inputCount": 1,
+        "inputCount": 2,
         "outputCount": 1,
         "paramTypes": {
           "type": "string",
@@ -83,9 +83,9 @@
         "y": 170.88114458317875
       },
       "data": {
-        "label": "Wine Quality Dataset for Red Wine",
+        "label": "Red Wine Dataset",
         "params": {
-          "type": "data_file",
+          "type": "ds_data_file",
           "adapter_type": "dlr_connector",
           "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/jin-conn/cp/protocol",
           "provider_bpn": "BPNLNWF14QKMQ9QE",
@@ -99,7 +99,7 @@
           "asset_id"
         ],
         "inputCount": 1,
-        "outputCount": 1,
+        "outputCount": 2,
         "paramTypes": {
           "type": "string",
           "adapter_type": "string",
@@ -134,7 +134,7 @@
           "type",
           "file_path"
         ],
-        "inputCount": 1,
+        "inputCount": 2,
         "outputCount": 1,
         "paramTypes": {
           "type": "string",
@@ -190,7 +190,7 @@
         "width": 340,
         "height": 173
       },
-      "selected": true,
+      "selected": false,
       "dragging": false
     }
   ],
@@ -209,23 +209,8 @@
       "target": "node-1783369036602",
       "targetHandle": "input_0",
       "animated": true,
-      "id": "xy-edge__node-1783368885402output_0-node-1783369036602input_0"
-    },
-    {
-      "source": "node-1783344464430",
-      "sourceHandle": "dep",
-      "target": "node-1783344667589",
-      "targetHandle": "dep",
-      "animated": true,
-      "id": "xy-edge__node-1783344464430dep-node-1783344667589dep"
-    },
-    {
-      "source": "node-1783368885402",
-      "sourceHandle": "dep",
-      "target": "node-1783369036602",
-      "targetHandle": "dep",
-      "animated": true,
-      "id": "xy-edge__node-1783368885402dep-node-1783369036602dep"
+      "id": "xy-edge__node-1783368885402output_0-node-1783369036602input_0",
+      "selected": false
     },
     {
       "source": "node-1783344667589",

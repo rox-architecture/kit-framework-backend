@@ -5,6 +5,14 @@ import shutil
 
 class Unzipper(Base):
     """Unzipper node."""
+    
+    # Input is always a list of Items
+    class InputSpec(BaseModel):
+        pass
+
+    # Output is always a list of Items
+    class OutputSpec(BaseModel):
+        pass
 
     class ParamSpec(BaseModel):
         """Unzipper node param spec."""

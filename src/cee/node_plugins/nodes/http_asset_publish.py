@@ -9,6 +9,14 @@ from cee.models.edc import HttpDataAddress
 class HttpAssetPublish(Base):
     """Asset Publish node."""
 
+    # Input is always a list of Items
+    class InputSpec(BaseModel):
+        pass
+
+    # Output is always a list of Items
+    class OutputSpec(BaseModel):
+        pass
+
     class ParamSpec(BaseModel):
         """Asset Publish node param spec."""
         adapter_type: str

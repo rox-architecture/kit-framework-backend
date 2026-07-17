@@ -21,9 +21,9 @@ NODE_REGISTRY = {
     "send_to_url": SendToUrl,
 
     # Dataspace Node Types
-    "data_file": DataFile,
-    "container_image": ContainerImage,
+    "ds_data_file": DataFile,
+    "ds_container": ContainerImage,
     "http_asset_publish": HttpAssetPublish,
-    "service_file": ServiceFile,
-    "service_stream": ServiceStream,
+    "ds_service_file": ServiceFile,
+    "ds_service_stream": ServiceStream,
 }

@@ -8,6 +8,10 @@ from cee.adapters_plugins.adapter_registry import ADAPTER_REGISTRY
 class DataFile(Base):
     """Data file node."""
 
+    # Input is always a list of Items
+    class InputSpec(BaseModel):
+        pass
+
     # Output is always a list of Items
     class OutputSpec(BaseModel):
         output_0: Item

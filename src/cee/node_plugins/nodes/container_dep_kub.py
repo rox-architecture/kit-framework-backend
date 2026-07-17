@@ -7,6 +7,14 @@ from kubernetes.client.exceptions import ApiException
 class ContainerDeploymentKubernetes(Base):
     """Container Deployment Kubernetes node."""
 
+    # Input is always a list of Items
+    class InputSpec(BaseModel):
+        pass
+
+    # Output is always a list of Items
+    class OutputSpec(BaseModel):
+        pass
+
     class ParamSpec(BaseModel):
         """Container Deployment Kubernetes node param spec."""
 
