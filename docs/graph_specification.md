@@ -4,7 +4,7 @@ Each workflow is a directed acyclic graph (DAG).
 
 A workflow graph is: 
 ```json
-Graph = {
+"Graph": {
     "nodes" : [],
     "edges" : []
 }

@@ -23,7 +23,6 @@ Long story short, below image shows the overview of the operation flow:
     - DLR dataspace portal: https://vision-x-dataspace.base-x-ecosystem.org/#/home
     - T-System dataspace portal: https://portal.dih.telekom.com/dataspaces/details/5fd05856-d574-4a27-b8fd-fffd8cb5ca75/ROX-DEV-SPACE
 - Step 2. Design a workflow (KIT) using the dataspace assets
-    - The graph is serialised into JSON and executed by the execution engine
     - [Graph specification](./graph_specification.md)
 - Step 3. Distribute the KITs
     - KITs can be shared via dataspace as an asset
