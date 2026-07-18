@@ -115,9 +115,10 @@ Run `mypy` for type checking via
 ## Running Examples
 
 > [!NOTE]
-> By default, the automatic negotiation option is disabled. 
-> For the running examples, enable it by running the below command: 
+> By default, the automatic negotiation option is disabled. For the running examples, enable it.
+> However, normally you don't want to negotiate all the assets without inspections. So, disable it in normal situations.
 
+Enable auto-nego by:
 ```bash
 cd test
 python activate_auto_nego.py
