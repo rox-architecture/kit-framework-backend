@@ -1,6 +1,6 @@
 # Concept Overview
 
-In a dataspace, a wide variety of resources can be represented as assets. Examples include raw data, files, container images, and service endpoints.
+In the dataspace, everything is represented as an asset: raw data, config files, container images, service endpoints, continuous data stream, and so on.
 We utilize these assets within executable workflows with interoperability.
 
 We design workflows to be:
@@ -10,9 +10,7 @@ We design workflows to be:
 - *Standardized*, through a common graph representation and predefined execution semantics.
 - *Value-generating*, by producing new data assets that enrich the digital ecosystem.
 
-This workflow model is based on the KIT (Keep-It-Together) concept introduced in the RoX project. A KIT is a collection of dataspace assets and instructions that define their interactions to accomplish a specific task. In essence, an executable workflow is equivalent to a KIT. 
-
-For example, imagine we have a KIT for **pick-and-place digital twin simulation** use case. Then, this KIT is basically a workflow containing dataspace assets such as 3D models, simulation software container, and configuration files.
+For example, imagine we have a KIT for *pick-and-place digital twin simulation* use case. Then, this KIT is basically a workflow containing dataspace assets such as 3D models, simulation software container, and configuration files.
 
 Long story short, below image shows the overview of the operation flow:
 
@@ -48,3 +46,6 @@ Below picture illustrates the framework architecture.
 
 ## Asset Taxonomy
 
+- File
+- Container
+- Stream

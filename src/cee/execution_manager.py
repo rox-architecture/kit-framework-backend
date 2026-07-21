@@ -16,7 +16,9 @@ class ExecutionManager:
 
         # TODO: add more configuration aspects
         self.configurations = {
-            "auto_nego": False, # automatically make required negotiations
+            "auto_nego": True, # automatically make required negotiations
+            "auto_nego_retry_wait_sec": 5, # wait each negotiation attempt for 5 seconds
+            "auto_nego_retry_count": 3,
         } 
 
     async def set_config(self, config_changes):

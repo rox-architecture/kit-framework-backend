@@ -2,6 +2,7 @@ from pydantic import BaseModel, HttpUrl
 from typing import Literal, Any
 from cee.schema.execution_schema import Item
 from cee.node_plugins.base import Base
+import time
 from cee.adapters_plugins.adapter_registry import ADAPTER_REGISTRY
 
 
@@ -51,7 +52,7 @@ class DataFile(Base):
         try:
             response = self.adapter.transfer_data_pull(asset_id)
         except Exception:
-            if config['auto_nego']: 
+            if config['auto_nego']:
                 print("automatic negotiation is triggered")
                 ack = self.adapter.initiate_negotiation(provider_bpn, provider_url, asset_id)
                 response = self.adapter.transfer_data_pull(asset_id)

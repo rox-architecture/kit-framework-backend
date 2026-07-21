@@ -165,7 +165,25 @@ class DlrAdapter(Adapter):
 
     def get_negotiated_assets(self) -> set[str]:
         """Return the IDs of all negotiated assets."""
+
+        endpoint = "cp/management/v3/contractnegotiations/request"
+        payload = {
+            "@context": EDC_CONTEXT, 
+            "@type": "QuerySpec",
+            "offset": 0,
+            "limit": 1000,
+            "sortField": "createdAt",
+            "sortOrder": "DESC",
+            "filterExpression": [
+                {
+                "operandLeft": "counterPartyId",
+                "operator": "=",
+                "operandRight": "BPNL000000000XXX"
+                }
+            ]
+            }
         return {edr.asset_id for edr in self._get_edrs()}
+
 
     def initiate_negotiation(
         self, provider_bpn: str, provider_url: str, asset_id: str

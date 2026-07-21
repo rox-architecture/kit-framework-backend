@@ -1,15 +1,33 @@
-# Dataspace Asset Composition Framework
+# Dataspace Workflow Execution Engine
 
-The Dataspace Asset Composition Framework enables users to compose and execute workflows using existing dataspace assets. While the framework facilitates the rapid utilization of these assets, the resulting data can be published back to the dataspace as new assets, continuously enriching the digital ecosystem.
-This framework follows the KIT (Keep-It-Together) concept, enabling assets in the digital ecosystem to interact with each other.
+The *Dataspace Workflow Execution Engine* executes workflow graphs provided as input in JSON format.
 
-A workflow is represented as a directed acyclic graph (DAG), where nodes represent functional units and edges capture execution order and data dependencies.
-- The summary of the overall concept and framework architecture can be found in [docs/concept_overview.md](./docs/concept_overview.md)
-- The explanation of the workflow graph can be found in [docs/graph_specification.md](./docs/graph_specification.md)
+The workflow implements the KIT (Keep-It-Together) concept by composing interoperable assets from dataspaces into a single executable pipeline. 
 
-We recommend to check the above documentations before going through the running examples at the end of this file.
+The asset providers or system designers create workflows to ensure that the associated dataspace assets are accessed and executed in the predefined sequence.
 
-## Setup (Development)
+In contrast, consumer users can simply execute the workflow to utilise the dataspace assets within their application as intended by the asset providers. This enables automated and repeatable pipeline execution.
+
+The overarching concept and the workflow graph specification are found in:
+- [docs/concept_overview.md](./docs/concept_overview.md)
+- [docs/graph_specification.md](./docs/graph_specification.md)
+
+## System Overview
+
+This repository contains the execution backend engine, along with an optional GUI tool for designing and visualising workflow graphs.
+
+The following figure illustrates how the backend execution engine and the frontend GUI can be setup and used in your system.
+
+<img src="./docs/resources/architecture.png" alt="Architecture" width="100%">
+
+* User A is the end user operating the robotic system.
+* The local system hosts both the frontend and the backend execution engine (GUI is optional).
+* The human user can create/import workflow graphs and trigger the execution through the frontend GUI.
+* The backend engine can communicate with the local system via the REST API.
+* The backend engine sends and receives data from the User A's dataspace connector via the Dataspace APIs.
+* The backend engine can communicate with runtime environments (e.g., Kubernetes) to deploy container images received from the datsapce.
+
+## Setup
 
 Install either with `pip` or `uv`. 
 
@@ -33,13 +51,11 @@ BASE_URL_DLR_CONNECTOR=...
 API_KEY_DLR_CONNECTOR=...
 ```
 
-### Optional: Graph Editor GUI
+### Graph Editor GUI (Optional)
 
-While users can create the workflow graph in JSON manually and pass it to the execution engine via Rest API, we provide GUI to make your life easier.
-With the GUI, you can:
-- Graphically create and edit graphs
-- Import/Export graphs
-- Play button to execute the graph (auto interaction with the execution engine)
+Generally, the workflow can be created manually in JSON format, and sent to the backend engine via Rest API for execution.
+
+However, using the provided GUI allows human users to visually design the graph and execute with a single button click.
 
 To install, go to the react-flow directory:
 ```
@@ -77,7 +93,7 @@ First run the database needed for the executione engine.
 docker compose up --build -d
 ```
 
-Then run the execution engine
+Then run the execution engine (you need the .venv activated)
 
 ```bash
 python main.py
@@ -95,13 +111,7 @@ cd react-flow/react-flow-editor
 npm run dev
 ```
 
-### Optional: Backend Engine Endpoints References
-
-```
-http://localhost:8080/docs
-```
-
-### Optional: Code Quality (Development)
+### Development: Code Quality (Optional)
 
 Run `ruff` for formatting and linting via
 
@@ -112,11 +122,30 @@ ruff check
 
 Run `mypy` for type checking via
 
+## Getting Started
+
+### Step 1. Be able to create assets and contracts in the dataspace
+- [DLR dataspace manual - Making Assets and Contracts](./docs/asset_creation_dlr_dataspace.pdf)
+- T-System dataspace manual (To be provided later)
+- What metadata should be provided when creating an asset?
+
+### Step 2. Design a workflow
+
+
+### Step 3. Distribute your workflow 
+
+### Step 4. Execute 
+
+
+
 ## Running Examples
+
+We recommend to check the above documentations before going through the running examples at the end of this file.
 
 > [!NOTE]
 > By default, the automatic negotiation option is disabled. For the running examples, enable it.
-> However, normally you don't want to negotiate all the assets without inspections. So, disable it in normal situations.
+> However, normally you don't want to negotiate all the assets automatically. So, disabling it is generally desired.
+> In this case, you can use the dataspace web portal to browse the assets and manually negotiate.
 
 Enable auto-nego by:
 ```bash
@@ -132,3 +161,8 @@ python activate_auto_nego.py
 ## Additional Documentations:
 - [Execution Mode Configurations](./docs/execution_modes.md)
 
+### Optional: Backend Engine Endpoints References
+
+```
+http://localhost:8080/docs
+```
