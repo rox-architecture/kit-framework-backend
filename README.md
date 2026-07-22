@@ -2,12 +2,11 @@
 
 The *Dataspace Workflow Execution Engine* executes workflow graphs provided as input in JSON format. 
 The workflow implements the KIT (Keep-It-Together) concept by composing a set of dataspace assets into a single executable pipeline.
+
 The asset providers (or system designers) can create workflows to ensure that the associated dataspace assets are accessed and executed in the predefined sequence.
 In contrast, consumer users can use the dataspace assets within their application simply by executing the workflow.
 
-The overarching concept and the workflow graph specification are found in:
-- [docs/concept_overview.md](./docs/concept_overview.md)
-- [docs/graph_specification.md](./docs/graph_specification.md)
+In essence, each workflow represents a KIT. For example, a robot simulation KIT can be represented as a workflow.
 
 > [!NOTE]
 > The execution engine is currently in beta
@@ -29,6 +28,27 @@ Below illustrates how these are setup and used in a system.
 * The backend engine sends and receives data from the User A's dataspace connector via the Dataspace APIs.
 * The backend engine can communicate with runtime environments (e.g., Kubernetes) to deploy container images received from the datsapce.
 * The backend engine can also write the data received from dataspace into the local file in the memory.
+
+## Workflow Lifecycle (from provider to consumer)
+
+<img src="./docs/resources/operation_workflow.png" alt="Architecture" width="100%">
+
+- Step 1. Create assets and contracts in the dataspace
+    - Provider users can use the dataspace web UI to create assets and contracts
+    - DLR dataspace portal: https://vision-x-dataspace.base-x-ecosystem.org/#/home
+    - T-System dataspace portal: https://portal.dih.telekom.com/dataspaces/details/5fd05856-d574-4a27-b8fd-fffd8cb5ca75/ROX-DEV-SPACE
+- Step 2. Design a workflow (KIT)
+    - [Graph specification](./docs/graph_specification.md)
+    - Use various node types with different behaviours to build your logic
+- Step 3. Distribute the KITs
+    - Consumer users receive the workflow (KIT) 
+    - Can be done via dataspace or other conventional methods like email
+- Step 4. Execute the KIT
+    - Access dataspace assets
+    - Required contract negotiation is made
+- Step 5. Result is produced
+    - Can be saved in the local system
+    - Can be published in the dataspace 
 
 ## Setup
 
