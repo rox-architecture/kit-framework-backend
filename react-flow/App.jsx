@@ -100,12 +100,12 @@ const PREDEFINED_NODE_TEMPLATES = {
     },
     lockedParams: ["type"],
   },
-  ds_data_file: {
-    label: "data_file",
+  ds_static_file: {
+    label: "ds_static_file",
     inputCount: 1,
     outputCount: 2,
     params: {
-      type: "ds_data_file",
+      type: "ds_static_file",
       adapter_type: "",
       provider_bpn: "",
       provider_url: "",
@@ -495,27 +495,6 @@ export default function App() {
     x: 100 + currentNodes.length * 30,
     y: 100 + currentNodes.length * 30,
   });
-
-  const addNode = () => {
-    const id = `node-${Date.now()}`;
-
-    setNodes((currentNodes) => [
-      ...currentNodes,
-      {
-        id,
-        type: "custom",
-        position: createNodePosition(currentNodes),
-        data: {
-          label: `Node ${currentNodes.length + 1}`,
-          params: {},
-          paramOrder: [],
-          paramTypes: {},
-          inputCount: 1,
-          outputCount: 1,
-        },
-      },
-    ]);
-  };
 
   const addPredefinedNode = () => {
     const template = PREDEFINED_NODE_TEMPLATES[selectedTemplateKey];
@@ -1039,10 +1018,6 @@ export default function App() {
       >
         <h2>Graph Editor</h2>
 
-        <button onClick={addNode} style={{ width: "100%", marginBottom: 8 }}>
-          + Add Node
-        </button>
-
         <div
           style={{
             display: "flex",
@@ -1062,7 +1037,7 @@ export default function App() {
             ))}
           </select>
           <button onClick={addPredefinedNode} style={{ flex: 1.3 }}>
-            + Add Predefined Node
+            + Add Node
           </button>
         </div>
 

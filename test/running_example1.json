@@ -10,7 +10,7 @@
       "data": {
         "label": "White Wine Dataset",
         "params": {
-          "type": "ds_data_file",
+          "type": "ds_static_file",
           "adapter_type": "dlr_connector",
           "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/jin-conn/cp/protocol",
           "provider_bpn": "BPNLNWF14QKMQ9QE",
@@ -85,7 +85,7 @@
       "data": {
         "label": "Red Wine Dataset",
         "params": {
-          "type": "ds_data_file",
+          "type": "ds_static_file",
           "adapter_type": "dlr_connector",
           "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/jin-conn/cp/protocol",
           "provider_bpn": "BPNLNWF14QKMQ9QE",

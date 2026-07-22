@@ -6,7 +6,7 @@ import time
 from cee.adapters_plugins.adapter_registry import ADAPTER_REGISTRY
 
 
-class DataFile(Base):
+class StaticFile(Base):
     """Data file node."""
 
     # Input is always a list of Items

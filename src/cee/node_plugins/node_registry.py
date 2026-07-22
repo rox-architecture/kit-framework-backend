@@ -1,5 +1,5 @@
 # dataspace nodes
-from cee.node_plugins.nodes.data_file import DataFile
+from cee.node_plugins.nodes.static_file import StaticFile
 from cee.node_plugins.nodes.container_image import ContainerImage
 from cee.node_plugins.nodes.service_file import ServiceFile
 from cee.node_plugins.nodes.service_stream import ServiceStream
@@ -21,9 +21,10 @@ NODE_REGISTRY = {
     "send_to_url": SendToUrl,
 
     # Dataspace Node Types
-    "ds_data_file": DataFile,
+    "ds_static_file": StaticFile,
     "ds_container": ContainerImage,
     "http_asset_publish": HttpAssetPublish,
     "ds_service_file": ServiceFile,
     "ds_service_stream": ServiceStream,
+    #TODO "ds_workflow": ...
 }

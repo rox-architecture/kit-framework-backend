@@ -1,6 +1,6 @@
 # Concept Overview
 
-In the dataspace, everything is represented as an asset: raw data, config files, container images, service endpoints, continuous data stream, and so on.
+
 We utilize these assets within executable workflows with interoperability.
 
 We design workflows to be:

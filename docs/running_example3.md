@@ -53,31 +53,6 @@ The workflow graph looks like this:
 ## Expected result:
 - HelloMsg container image is pushed to the local registry and deployed via Kubernetes API
 
-## Run the workflow:
-
-Keep your backend engine terminal visible to observe the console outputs.
-
-### Run Method 1
-
-In GUI, find the green button on the right top screen, click it
-
-### Run Method 2
-
-Use Rest API to trigger the execution. For now, we can use `curl` at the root directory.
-
-```bash
-curl -X POST http://localhost:8080/workflows \
-  -H "Content-Type: application/json" \
-  --data "{\"workflow_name\":\"my-workflow\",\"graph_json\":$(cat test/running_example1.json)}"
-```
-
-In the response, find the `workflow_id` to make the next request (replace `<<workflow_id>>` with the id value)
-```bash
-curl -X POST http://localhost:8080/execution/request \
-  -H "Content-Type: application/json" \
-  --data '{"workflow_id":"<<workflow_id>>"}'
-```
-
 ## Execution Result
 
 Check if the container image is available in the local registry
