@@ -26,7 +26,7 @@ The key benefits of this approach are:
 
 * **Consolidated dependency analysis**
   Complex systems, such as robotic applications, often depend on multiple hardware and software requirements. A workflow can consolidate the dependencies of all included assets into a single overview, making it easier to detect missing requirements or conflicts.
-  
+
 
 ## System Structure
 
@@ -306,7 +306,7 @@ curl -X POST http://localhost:8080/execution/request \
 ```
 
 > [!WARNING]
-> When you trigger the workflow, you may see "negotiation required" warning. Currently, the backend engine is set to make required negotiation automatically (which can be disabled). However, the auto negotiation is not fully implemented, hence it terminates the workflow instead of waiting for the negotiation. In this case, you can simply re-trigger the workflow. After a few attempts, the negotiation will be completed and the workflow will execute successfully.
+> When you trigger the workflow, you may see "negotiation required" warning. Currently, the backend engine is set to make required negotiation automatically (which can be disabled). However, the auto negotiation is not fully implemented, hence it terminates the workflow instead of waiting for the negotiation. In this case, you can simply re-trigger the workflow. After a few attempts, the negotiation will be completed and the workflow will execute successfully, and can be repeatedly executed.
 
 ## Notes
 
