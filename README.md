@@ -1,17 +1,34 @@
 # Dataspace Workflow Execution Engine (Beta)
 
 The *Dataspace Workflow Execution Engine* executes workflow graphs provided as input in JSON format. 
-The workflow implements the KIT (Keep-It-Together) concept by composing a set of dataspace assets into a single executable pipeline.
 
 The asset providers (or system designers) can create workflows to ensure that the associated dataspace assets are accessed and executed in the predefined sequence.
-In contrast, consumer users can use the dataspace assets within their application simply by executing the workflow.
-
-In essence, each workflow represents a KIT. For example, a robot simulation KIT can be represented as a workflow.
+As such, consumers can receive a workflow as a JSON file and execute it with minimal configuration, enabling them to use dataspace assets within their local applications.
 
 > [!NOTE]
 > The execution engine is currently in beta
 
-## System Overview
+## Concept Overview
+
+Current dataspaces enable sharing of individual assets. However, most of real-world applications require multiple interoperable assets to be combined into a processing pipeline. We address this challenge by enabling executable workflows using dataspace assets.
+
+A KIT (Keep-It-Together) is a collection of interoperable assets together with instructions describing how these assets interact to accomplish a specific task. In essence, a workflow is the executable representation of a KIT.
+
+The key benefits of this approach are:
+
+<img src="./docs/resources/benefits.png" alt="Architecture" width="100%">
+
+* **Quick adoption in user applications**
+  Consumers can use a provided workflow as a starting point, configure only the required parameters, and execute it within their local application environment.
+
+* **Easy customisation and reconfiguration**
+  A workflow can also serve as a reusable template. Individual assets can be replaced with compatible alternatives without redesigning the entire workflow.
+
+* **Consolidated dependency analysis**
+  Complex systems, such as robotic applications, often depend on multiple hardware and software requirements. A workflow can consolidate the dependencies of all included assets into a single overview, making it easier to detect missing requirements or conflicts.
+  
+
+## System Structure
 
 This repository contains: 
 - Execution backend engine
@@ -50,7 +67,7 @@ Below illustrates how these are setup and used in a system.
     - Can be saved in the local system
     - Can be published in the dataspace 
 
-## Setup
+## Installation and Setup
 
 Install either with `pip` or `uv`. 
 
