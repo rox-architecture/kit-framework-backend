@@ -8,6 +8,7 @@ from cee.node_plugins.nodes.zipper import Zipper
 from cee.node_plugins.nodes.unzipper import Unzipper
 from cee.node_plugins.nodes.send_to_url import SendToUrl
 from cee.node_plugins.nodes.http_asset_publish import HttpAssetPublish
+from cee.node_plugins.nodes.docker_command import DockerCommand
 
 # Utility nodes
 from cee.node_plugins.nodes.save_to_file import SaveToFile
@@ -19,6 +20,7 @@ NODE_REGISTRY = {
     "zipper": Zipper,
     "unzipper": Unzipper,
     "send_to_url": SendToUrl,
+    "docker_command": DockerCommand,
 
     # Dataspace Node Types
     "ds_static_file": StaticFile,

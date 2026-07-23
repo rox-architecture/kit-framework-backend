@@ -11,6 +11,7 @@ A workflow graph is:
 ```
 
 ## Node Definition
+
 Each node is a functional unit with a specific behaviour. For example:
 - Download a file from dataspace
 - Save data to a file
@@ -23,11 +24,24 @@ A node looks like below:
 
 <img src="./resources/node_image.png" alt="Architecture" width="50%">
 
-- Every node has at least one input and output port. The first I/O ports are reserved for `dep`
-- Additional I/O ports are automatically named `input_0, 1, 2, ...` and `output_0, 1, 2, ...`
+- Every node has at least one input and output port. The first I/O port is reserved for `dep`. The `dep` port does not carry any data.
+- Additional I/O ports are automatically named `input_0, 1, 2, ...` and `output_0, 1, 2, ...`. These I/O ports carries data to another node.
+- Each input and output ports, except `dep`, have the same data type `Item` (see the definition below). This means that the data exchange between nodes is done by wrapping data into the `Item` format.
 - Each parameter is a (key:value) pair
-- `type` parameter is mandatory. The node type defines the implemented behaviour of the node
+- The `type` parameter represents the node type and it is a mandatory parameter. The node type defines the node behaviour
 - Node Label is a non-unique name for the node
+
+The input and output data type `Item` is:
+```python
+class Item(BaseModel):
+    """Item model."""
+    json_data: dict[str, Any] = Field(default_factory=dict)
+    binary: bytes
+```
+
+The `json_data` part is to carry metadata while `binary` is to pass the actual data content.
+If one wants to share a JSON file as data, then it should be passed in `binary`. 
+Because, `json_data` is only the description of the data. 
 
 This node is translated into JSON like below:
 
@@ -68,19 +82,20 @@ This node is translated into JSON like below:
 ```
 
 ## Edge Definition
-Each edge captures the dependencies between nodes, either:
-- Execution dependency (i.e., one node must execute before another)
-- Dataflow dependency (i.e., output is the input to another node)
+
+Each edge captures the execution dependencies between nodes. In particular, it captures either:
+- Execution order dependency (i.e., one node must execute before another)
+- Dataflow dependency (i.e., output is sent to the input to another node)
 
 Below shows edges between 4 nodes.
 
 <img src="./resources/edge_image.png" alt="Architecture" width="100%">
 
-- The `dep` port does not carry any data. It is used to indicate the execution order.
+- The `dep` port does not carry any data. It is used to indicate only the execution order.
     - Node 3 and Node 4 are executed sequentially (i.e., Node 4 waits for Node 3)
 - Node 1 (`output_0`) carries data to Node 2 (`input_1`)
     - Node 1 is executed before Node 2 due to the data dependency
-- Node 1 and Node 3 are executed in parallel as there is no dependency
+- Node 1 and Node 3 are executed in parallel as there is no dependencies
 
 > [!NOTE]
 > The execution order is determined by the **DAG topological sort** algorithm
@@ -107,18 +122,6 @@ The above edges are expressed in JSON like below:
     }
   ]
 ```
-
-The data exchange between nodes is always in the type `Item`.
-```python
-class Item(BaseModel):
-    """Item model."""
-    json_data: dict[str, Any] = Field(default_factory=dict)
-    binary: bytes
-```
-The `json_data` part is to carry metadata while `binary` is to pass the actual data content.
-If one wants to share a JSON file as data, then it should be passed in `binary`. 
-Because, `json_data` is only the description of the data. 
-
 
 ## Already Implemented Nodes
 

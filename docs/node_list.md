@@ -13,7 +13,7 @@ The node types are divided into two categories depending on whether they interac
 
 ---
 
-## Type: `ds_data_file`
+## Type: `ds_static_file`
 
 **Category:** Dataspace
 

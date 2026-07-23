@@ -19,7 +19,7 @@ The key benefits of this approach are:
 <img src="./docs/resources/benefits.png" alt="Architecture" width="100%">
 
 * **Quick adoption in user applications**
-  Consumers can use a provided workflow as a starting point, configure only the required parameters, and execute it within their local application environment.
+  Consumers can use a provided workflow as a starting point, configure only the required parameters (e.g., port mapping, container image name, etc.), and execute it within their local application environment. 
 
 * **Easy customisation and reconfiguration**
   A workflow can also serve as a reusable template. Individual assets can be replaced with compatible alternatives without redesigning the entire workflow.
