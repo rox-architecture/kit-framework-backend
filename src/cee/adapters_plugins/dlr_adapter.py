@@ -1,5 +1,5 @@
 import os
-from functools import lru_cache
+import time
 from typing import Any
 
 import requests
@@ -46,22 +46,6 @@ class DlrAdapter(Adapter):
         self.session = requests.Session()
         self.session.headers.update({"Authorization": f"Bearer {self.api_key}"})
 
-    @lru_cache(maxsize=1)
-    def _get_edrs(self) -> list[Edr]:
-        """Return all EDRs."""
-        endpoint = "cp/management/v3/edrs/request"
-        url = f"{self.base_url}/{endpoint}"
-        payload = {
-            "@context": EDC_CONTEXT,
-            "@type": "QuerySpec",
-            "offset": 0,
-            "limit": 10000,
-        }
-
-        response = self.session.post(url, json=payload)
-        response.raise_for_status()
-        return EdrsAdapter.validate_python(response.json())
-
     def _get_catalog(self, provider_bpn: str, provider_url: str) -> Catalog:
         """Return the catalog for the given provider."""
         endpoint = "cp/management/v3/catalog/request"
@@ -89,18 +73,51 @@ class DlrAdapter(Adapter):
             return dataset
         return None
 
-    def _get_edr_data_address(
-        self, edrs: list[Edr], asset_id: str
-    ) -> EdrDataAddress | None:
+    def _get_edr(self, asset_id: str) -> Edr | None:
+        """Return an EDR for the given asset ID."""
+        endpoint = "cp/management/v3/edrs/request"
+        url = f"{self.base_url}/{endpoint}"
+        payload = {
+            "@context": EDC_CONTEXT,
+            "@type": "QuerySpec",
+            "filterExpression": [
+                {
+                    "operandLeft": "assetId",
+                    "operator": "=",
+                    "operandRight": asset_id
+                }
+            ]
+        }
+
+        response = self.session.post(url, json=payload)
+        response.raise_for_status()
+        edrs = EdrsAdapter.validate_python(response.json())
+
+        if len(edrs) == 0:
+            return None
+        return edrs[0]
+
+    def _get_edrs(self) -> list[Edr]:
+        """Return all EDRs."""
+        endpoint = "cp/management/v3/edrs/request"
+        url = f"{self.base_url}/{endpoint}"
+        payload = {
+            "@context": EDC_CONTEXT,
+            "@type": "QuerySpec",
+            "offset": 0,
+            "limit": 10000,
+        }
+
+        response = self.session.post(url, json=payload)
+        response.raise_for_status()
+        return EdrsAdapter.validate_python(response.json())
+
+    def _get_edr_data_address(self, edr: Edr) -> EdrDataAddress:
         """Return the EDR data address for the asset with the given ID."""
-        for edr in edrs:
-            if edr.asset_id != asset_id:
-                continue
-            endpoint = f"cp/management/v3/edrs/{edr.transfer_process_id}/dataaddress"
-            url = f"{self.base_url}/{endpoint}"
-            response = self.session.get(url)
-            return EdrDataAddress.model_validate(response.json())
-        return None
+        endpoint = f"cp/management/v3/edrs/{edr.transfer_process_id}/dataaddress"
+        url = f"{self.base_url}/{endpoint}"
+        response = self.session.get(url)
+        return EdrDataAddress.model_validate(response.json())
 
     # TODO: replace _get_target_offer_by_id with a proper way of fetching the policy
     def _initiate_negotiation(
@@ -165,23 +182,6 @@ class DlrAdapter(Adapter):
 
     def get_negotiated_assets(self) -> set[str]:
         """Return the IDs of all negotiated assets."""
-
-        endpoint = "cp/management/v3/contractnegotiations/request"
-        payload = {
-            "@context": EDC_CONTEXT, 
-            "@type": "QuerySpec",
-            "offset": 0,
-            "limit": 1000,
-            "sortField": "createdAt",
-            "sortOrder": "DESC",
-            "filterExpression": [
-                {
-                "operandLeft": "counterPartyId",
-                "operator": "=",
-                "operandRight": "BPNL000000000XXX"
-                }
-            ]
-            }
         return {edr.asset_id for edr in self._get_edrs()}
 
 
@@ -198,6 +198,18 @@ class DlrAdapter(Adapter):
 
         self._initiate_negotiation(offer, provider_bpn, provider_url)
 
+        start = time.monotonic()
+        timeout = 30
+        interval = 3
+        edr = None
+
+        while edr is None:
+            edr = self._get_edr(asset_id)
+            if time.monotonic() - start >= timeout:
+                error_message = "Timed out waiting for negotiation"
+                raise TimeoutError(error_message)
+            time.sleep(interval)
+
     def transfer_data_pull(
         self,
         asset_id: str,
@@ -207,16 +219,15 @@ class DlrAdapter(Adapter):
         payload: Any = None,
     ) -> requests.Response:
         """Initiate a PULL transfer for the asset with the given ID."""
-        edrs = self._get_edrs()
-        data_address = self._get_edr_data_address(edrs, asset_id)
+        edr = self._get_edr(asset_id)
+        if edr is None:
+            error_message = "No EDR found"
+            raise ValueError(error_message)
 
-        if data_address is None:
-            error_message = "Negotiation required"
-            raise PermissionError(error_message)
-
+        data_address = self._get_edr_data_address(edr)
         url = data_address.endpoint + (subpath or "")
         headers = {"Authorization": data_address.authorization}
-        
+
         response = requests.request(
             method, url, headers=headers, json=payload, timeout=30
         )
