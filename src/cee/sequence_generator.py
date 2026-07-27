@@ -9,11 +9,11 @@ class SequenceGenerator:
     def __init__(self, graph_json: dict[str, Any]) -> None:
         """Initialize the instance."""
         self.graph_json = graph_json
-        self.graph = self._build_graph()
+        self.graph: nx.DiGraph[str] = self._build_graph()
 
-    def _build_graph(self) -> nx.DiGraph:
+    def _build_graph(self) -> nx.DiGraph[str]:
         """Build a DAG."""
-        graph = nx.DiGraph()
+        graph: nx.DiGraph[str] = nx.DiGraph()
 
         for node in self.graph_json.get("nodes", []):
             graph.add_node(node["id"], **node)
@@ -27,9 +27,18 @@ class SequenceGenerator:
         """Verify the DAG."""
         return nx.is_directed_acyclic_graph(self.graph)
 
-    # topological generation sort
-    def generate_plan(self) -> list[list[str]]:
-        """Generate a plan."""
-        # return 2d list, where each element is 1d to enable parallelisation in the future
-        # TODO: efficient DAG execution order calculation algorithm is needed: minimisation of memory footage and maximisation of the parallelisation
-        return [[level] for level in nx.topological_sort(self.graph)]
+    def generate_plan(self) -> dict[str, dict[str, list[str]] | list[str]]:
+        """Generate dependency metadata for dynamic, readiness-based scheduling."""
+        return {
+            "predecessors": {
+                str(node): [str(value) for value in self.graph.predecessors(node)]
+                for node in self.graph.nodes
+            },
+            "successors": {
+                str(node): [str(value) for value in self.graph.successors(node)]
+                for node in self.graph.nodes
+            },
+            "roots": [
+                str(node) for node, degree in self.graph.in_degree() if degree == 0
+            ],
+        }
