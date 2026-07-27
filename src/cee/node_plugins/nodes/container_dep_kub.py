@@ -1,8 +1,11 @@
 from pydantic import BaseModel, Field
 from typing import Literal, Any
+
 from cee.node_plugins.base import Base
-from kubernetes import client, config
+from kubernetes import client, config as kube_config
 from kubernetes.client.exceptions import ApiException
+from kubernetes.config.config_exception import ConfigException
+
 
 class ContainerDeploymentKubernetes(Base):
     """Container Deployment Kubernetes node."""
@@ -16,7 +19,7 @@ class ContainerDeploymentKubernetes(Base):
         pass
 
     class ParamSpec(BaseModel):
-        """Container Deployment Kubernetes node param spec."""
+        """Container Deployment Kubernetes node parameter specification."""
 
         deployment_name: str
         replicas: int
@@ -26,45 +29,60 @@ class ContainerDeploymentKubernetes(Base):
         image_tag: str
         registry: str | None = None
 
-        image_pull_policy: Literal["Always", "IfNotPresent", "Never"] = Field(
-                default="IfNotPresent",
-                description="Kubernetes container image pull policy",
-            )
-
+        image_pull_policy: Literal[
+            "Always",
+            "IfNotPresent",
+            "Never",
+        ] = Field(
+            default="IfNotPresent",
+            description="Kubernetes container image pull policy",
+        )
 
     def __init__(self, node: dict[str, Any]) -> None:
         """Initialize the instance."""
         super().__init__(node)
 
-
-    def run(self, config: dict, input_data: dict | None = None) -> None:
-        """Run the ndoe."""
+    def run(
+        self,
+        config: dict,
+        input_data: dict | None = None,
+    ) -> None:
+        """Run the node."""
         print(f"[Node {self.node_id}] Execution started")
 
         # ----------------------------------------------------
         # Read parameters
         # ----------------------------------------------------
-        deployment_name = self.params['deployment_name']
-        replicas = self.params['replicas']
-        namespace = self.params['namespace']
-        
-        image_name = self.params['image_name']
-        image_tag = self.params['image_tag']
-        registry = self.params['registry']
+        deployment_name = self.params["deployment_name"]
+        replicas = self.params["replicas"]
+        namespace = self.params["namespace"]
+
+        image_name = self.params["image_name"]
+        image_tag = self.params["image_tag"]
+        registry = self.params.get("registry")
         image_pull_policy = self.params["image_pull_policy"]
 
         # ----------------------------------------------------
         # Build full image name
         # ----------------------------------------------------
         if registry:
-            full_image_name = f"{registry.rstrip('/')}/{image_name}:{image_tag}"
+            full_image_name = (
+                f"{registry.rstrip('/')}/{image_name}:{image_tag}"
+            )
         else:
             full_image_name = f"{image_name}:{image_tag}"
 
         # ----------------------------------------------------
         # Connect to Kubernetes
         # ----------------------------------------------------
-        config.load_kube_config()
+        try:
+            # Use the ServiceAccount configuration when this
+            # application is running inside a Kubernetes Pod.
+            kube_config.load_incluster_config()
+        except ConfigException:
+            # Otherwise, use the local ~/.kube/config file.
+            kube_config.load_kube_config()
+
         apps_v1 = client.AppsV1Api()
 
         # ----------------------------------------------------
@@ -74,7 +92,7 @@ class ContainerDeploymentKubernetes(Base):
             name=deployment_name,
             image=full_image_name,
             image_pull_policy=image_pull_policy,
-        )        
+        )
 
         pod_template = client.V1PodTemplateSpec(
             metadata=client.V1ObjectMeta(
@@ -108,7 +126,7 @@ class ContainerDeploymentKubernetes(Base):
 
         # ----------------------------------------------------
         # Deploy
-        # ----------------------------------------------------       
+        # ----------------------------------------------------
         try:
             apps_v1.create_namespaced_deployment(
                 namespace=namespace,
@@ -116,7 +134,8 @@ class ContainerDeploymentKubernetes(Base):
             )
 
             print(
-                f"[Node {self.node_id}] Deployment '{deployment_name}' created successfully."
+                f"[Node {self.node_id}] Deployment "
+                f"'{deployment_name}' created successfully."
             )
 
         except ApiException as e:
