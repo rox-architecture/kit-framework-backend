@@ -1,4 +1,53 @@
+x-app-environment: &app-environment
+  DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://admin:admin@db:5432/workflowdb}
+  CELERY_BROKER_URL: ${CELERY_BROKER_URL:-redis://redis:6379/0}
+  CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND:-redis://redis:6379/1}
+  ARTIFACT_ROOT: ${ARTIFACT_ROOT:-/artifacts}
+  SCHEDULER_POLL_INTERVAL: ${SCHEDULER_POLL_INTERVAL:-0.5}
+  ARTIFACT_RETENTION: ${ARTIFACT_RETENTION:-3600}
+  RETAIN_FAILED_ARTIFACTS: ${RETAIN_FAILED_ARTIFACTS:-true}
+  BASE_URL_DLR_CONNECTOR: ${BASE_URL_DLR_CONNECTOR:-}
+  API_KEY_DLR_CONNECTOR: ${API_KEY_DLR_CONNECTOR:-}
+  BASE_URL_TS_CONNECTOR: ${BASE_URL_TS_CONNECTOR:-}
+  API_KEY_TS_CONNECTOR: ${API_KEY_TS_CONNECTOR:-}
+
+x-app-base: &app-base
+  build: .
+  environment: *app-environment
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  volumes:
+    - execution_artifacts:/artifacts
+  restart: unless-stopped
+
 services:
+  api:
+    <<: *app-base
+    container_name: canvas-execution-api
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  worker:
+    <<: *app-base
+    command:
+      - sh
+      - -c
+      - celery -A cee.celery_app:celery_app worker --loglevel=INFO --concurrency=$${CELERY_WORKER_CONCURRENCY:-4}
+    environment:
+      <<: *app-environment
+      CELERY_WORKER_CONCURRENCY: ${CELERY_WORKER_CONCURRENCY:-4}
+    volumes:
+      - execution_artifacts:/artifacts
+      - /var/run/docker.sock:/var/run/docker.sock
+
   db:
     image: postgres:16
     container_name: canvas-execution-db
@@ -6,10 +55,23 @@ services:
       POSTGRES_DB: workflowdb
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
-    ports:
-      - "5432:5432"
     volumes:
       - workflow_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d workflowdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: canvas-execution-redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
 volumes:
   workflow_pg_data:
+  execution_artifacts:
