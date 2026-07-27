@@ -3,21 +3,26 @@ from typing import Literal, Any
 from cee.schema.execution_schema import Item
 from cee.node_plugins.base import Base
 from cee.adapters_plugins.adapter_registry import ADAPTER_REGISTRY
+from cee.models.edc import HttpDataAddress
 
 
 class HttpAssetPublish(Base):
     """Asset Publish node."""
 
+    # Input is always a list of Items
     class InputSpec(BaseModel):
-        """Asset Publish node input spec."""
-        input_0: Item # metadata + access information
+        pass
+
+    # Output is always a list of Items
+    class OutputSpec(BaseModel):
+        pass
 
     class ParamSpec(BaseModel):
         """Asset Publish node param spec."""
         adapter_type: str
         asset_id: str
-        connector_url: HttpUrl
-        
+        properties: dict[str, Any]
+        data_address: HttpDataAddress
 
     def __init__(self, node: dict[str, Any]) -> None:
         """Initialize the instance."""
@@ -28,10 +33,16 @@ class HttpAssetPublish(Base):
         self.adapter = ADAPTER_REGISTRY[adapter_type]()
 
 
-    def run(self, input_data: dict | None = None) -> None:
+    def run(self, config: dict, input_data: dict | None = None) -> None:
         """Run the ndoe."""
         print(f"[Node {self.node_id}] Execution started")
 
+        # read params
+        asset_id = self.params['asset_id']
+        properties = self.params['properties']
+        data_address = self.params['data_address']
+
+        self.adapter.create_asset(asset_id, properties, data_address)
        
         self.finished = True
         

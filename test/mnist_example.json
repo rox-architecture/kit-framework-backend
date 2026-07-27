@@ -1,0 +1,255 @@
+{
+  "nodes": [
+    {
+      "id": "ds_static_file-1784678903514",
+      "type": "custom",
+      "position": {
+        "x": -128.5258650756403,
+        "y": -28.446606759553504
+      },
+      "data": {
+        "label": "MNIST train data",
+        "templateKey": "ds_static_file",
+        "isPredefined": true,
+        "params": {
+          "type": "ds_static_file",
+          "adapter_type": "dlr_connector",
+          "provider_bpn": "BPNLPMOX3Q8EO06P",
+          "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/rox-test-connector/cp/protocol",
+          "asset_id": "0764c293-da83-4f24-8901-99c68580dcd8"
+        },
+        "paramOrder": [
+          "type",
+          "adapter_type",
+          "provider_bpn",
+          "provider_url",
+          "asset_id"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "adapter_type": "string",
+          "provider_bpn": "string",
+          "provider_url": "string",
+          "asset_id": "string"
+        },
+        "paramValidators": {
+          "provider_url": "url"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 1,
+        "outputCount": 2
+      },
+      "measured": {
+        "width": 340,
+        "height": 225
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "save_to_file-1784681871591",
+      "type": "custom",
+      "position": {
+        "x": 310.6197190187131,
+        "y": 85.2993595760341
+      },
+      "data": {
+        "label": "save_to_file",
+        "templateKey": "save_to_file",
+        "isPredefined": true,
+        "params": {
+          "type": "save_to_file",
+          "file_path": "downloads/mnist_train.csv"
+        },
+        "paramOrder": [
+          "type",
+          "file_path"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "file_path": "string"
+        },
+        "paramValidators": {
+          "file_path": "path"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 2,
+        "outputCount": 1
+      },
+      "measured": {
+        "width": 340,
+        "height": 147
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "save_to_file-1784682193160",
+      "type": "custom",
+      "position": {
+        "x": 313.2168991401176,
+        "y": 300.15864069067607
+      },
+      "data": {
+        "label": "save_to_file",
+        "templateKey": "save_to_file",
+        "isPredefined": true,
+        "params": {
+          "type": "save_to_file",
+          "file_path": "downloads/mnist_test.csv"
+        },
+        "paramOrder": [
+          "type",
+          "file_path"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "file_path": "string"
+        },
+        "paramValidators": {
+          "file_path": "path"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 2,
+        "outputCount": 1
+      },
+      "measured": {
+        "width": 340,
+        "height": 147
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "zipper-1784682214729",
+      "type": "custom",
+      "position": {
+        "x": 742.7996076930389,
+        "y": 169.106786480893
+      },
+      "data": {
+        "label": "zipper",
+        "templateKey": "zipper",
+        "isPredefined": true,
+        "params": {
+          "type": "zipper",
+          "target_directory": "downloads",
+          "output_path": "downloads/mnist_csv.zip"
+        },
+        "paramOrder": [
+          "type",
+          "target_directory",
+          "output_path"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "target_directory": "string",
+          "output_path": "string"
+        },
+        "paramValidators": {
+          "target_directory": "path",
+          "output_path": "path"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 1,
+        "outputCount": 1
+      },
+      "measured": {
+        "width": 340,
+        "height": 173
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "ds_static_file-1784682694047",
+      "type": "custom",
+      "position": {
+        "x": -129.09077588174586,
+        "y": 317.5016630891659
+      },
+      "data": {
+        "label": "ds_static_file",
+        "templateKey": "ds_static_file",
+        "isPredefined": true,
+        "params": {
+          "type": "ds_static_file",
+          "adapter_type": "dlr_connector",
+          "provider_bpn": "BPNLM67H9AVUVPTD",
+          "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/dlr-rox-conn/cp/protocol",
+          "asset_id": "1f55d1f9-db70-4e8a-b6a7-425cde077cb4"
+        },
+        "paramOrder": [
+          "type",
+          "adapter_type",
+          "provider_bpn",
+          "provider_url",
+          "asset_id"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "adapter_type": "string",
+          "provider_bpn": "string",
+          "provider_url": "string",
+          "asset_id": "string"
+        },
+        "paramValidators": {
+          "provider_url": "url"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 1,
+        "outputCount": 2
+      },
+      "measured": {
+        "width": 340,
+        "height": 225
+      },
+      "selected": false,
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "source": "ds_static_file-1784678903514",
+      "sourceHandle": "output_0",
+      "target": "save_to_file-1784681871591",
+      "targetHandle": "input_0",
+      "id": "edge-ds_static_file-1784678903514-source:output_0-save_to_file-1784681871591-target:input_0-1784681879513",
+      "animated": true
+    },
+    {
+      "source": "save_to_file-1784681871591",
+      "sourceHandle": "dep",
+      "target": "zipper-1784682214729",
+      "targetHandle": "dep",
+      "id": "edge-save_to_file-1784681871591-source:dep-zipper-1784682214729-target:dep-1784682219849",
+      "animated": true
+    },
+    {
+      "source": "save_to_file-1784682193160",
+      "sourceHandle": "dep",
+      "target": "zipper-1784682214729",
+      "targetHandle": "dep",
+      "id": "edge-save_to_file-1784682193160-source:dep-zipper-1784682214729-target:dep-1784682221665",
+      "animated": true
+    },
+    {
+      "source": "ds_static_file-1784682694047",
+      "sourceHandle": "output_0",
+      "target": "save_to_file-1784682193160",
+      "targetHandle": "input_0",
+      "id": "edge-ds_static_file-1784682694047-source:output_0-save_to_file-1784682193160-target:input_0-1784682697984",
+      "animated": true
+    }
+  ]
+}

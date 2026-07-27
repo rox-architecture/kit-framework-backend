@@ -29,6 +29,18 @@ class ExecutionManager:
         self._task: asyncio.Task[None] | None = None
         self._running = False
         self._cleanup_after: dict[str, float] = {}
+        self._running_tasks: dict[str, asyncio.Task] = {}  # for the worker cancellation
+
+        # TODO: add more configuration aspects
+        self.configurations = {
+            "auto_nego": True, # automatically make required negotiations
+            "auto_nego_retry_wait_sec": 5, # wait each negotiation attempt for 5 seconds
+            "auto_nego_retry_count": 3,
+        } 
+
+    async def set_config(self, config_changes):
+        self.configurations.update(config_changes)
+        return self.configurations
 
     async def start(self) -> None:
         """Start the coordinator polling loop."""
@@ -59,6 +71,99 @@ class ExecutionManager:
         self._schedule_cleanup(execution_id, "CANCELLED")
         return True
 
+
+    # TODO: this part is where the workflow is executed by the worker
+    async def run_worker(self, reference_id: str, workflow: Workflow) -> None:
+        """Run the given workflow in a worker."""
+        failed = False
+        graph = workflow.graph_json
+        sequence = workflow.execution_flow
+
+        try:
+            print(f"[Execution {reference_id}] Start workflow")
+            DbHandlerExecution.execution_started(reference_id)
+
+            # ----------------------------------------------------------------------
+            # Construct executable objects for every node in the graph
+            # ----------------------------------------------------------------------
+            executable_nodes = {}
+            for node in graph["nodes"]:
+                node_id = node["id"]
+                node_type = node["data"]["params"]["type"]
+                node_class = NODE_REGISTRY[
+                    node_type
+                ]  # select the correct node class from the registry
+                print(f"[Execution {reference_id}]", end=" ")
+                executable_nodes[node_id] = node_class(
+                    node
+                )  # instantiate the node object
+
+            # ----------------------------------------------------------------------
+            # Check the workflow validity (executability)
+            # ----------------------------------------------------------------------
+
+            # TODO: store the nodes requiring negotiation to inform the user later
+            # nego_required_nodes = []
+            # if not self.configurations['auto_nego']:
+            #     for node in executable_nodes.values():
+            #         if not node.check_validty():
+            #             error_message = "Negotiation is required while auto-nego is disabled"
+            #             raise ValueError(error_message)
+                    
+            # ----------------------------------------------------------------------
+            # Execute the node objects and handle their connections
+            # ----------------------------------------------------------------------
+            for index, generation in enumerate(sequence): # iterate over the execution sequence
+                # sequential node execution 
+                # TODO: parallelisation
+                for node_id in generation:
+                    # this is the current node to execute
+                    node_obj = executable_nodes[node_id]
+
+                    # the node needs input data to execute
+                    ingress_edges = [e for e in graph['edges'] if e['target'] == node_id]
+                    input_data = {}
+
+                    # collect the input_data required
+                    for e in ingress_edges:
+                        # find out the source node and port information
+                        predescent_node_id = e['source']
+                        source_port_ref = e['sourceHandle']
+
+                        # get the predescent node executable object to get the output Item
+                        predescent_node_obj = executable_nodes[predescent_node_id]
+                        item = predescent_node_obj.get_output(source_port_ref)
+
+                        # if no output is available from the source node
+                        if item is None:
+                            continue
+
+                        # find out which input port this Item is connected
+                        target_port_ref = e['targetHandle']
+                        input_data[target_port_ref] = item
+
+                    # execute the node in a non-blocking way
+                    await asyncio.to_thread(node_obj.run, self.configurations, input_data)
+
+
+        except asyncio.CancelledError:
+            print(f"[Execution {reference_id}] Cancelled workflow {reference_id}")
+            DbHandlerExecution.execution_cancelled(reference_id)
+            raise
+
+        except Exception as e:
+            print(f"[Execution {reference_id}] Failed workflow {reference_id}: {e}")
+            DbHandlerExecution.execution_failed(reference_id)
+            failed = True
+
+        finally:
+            if not failed:
+                print(f"[Execution {reference_id}] Finished workflow {reference_id}")
+                DbHandlerExecution.execution_finished(reference_id)
+
+    # This is the main loop of the execution manager
+    # The schedule db is monitored
+>>>>>>> src/cee/execution_manager.py
     async def run(self) -> None:
         """Continuously claim executions and advance ready nodes."""
         while self._running:

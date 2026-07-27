@@ -1,11 +1,107 @@
 {
   "nodes": [
     {
-      "id": "container_image-1784112177357",
+      "id": "data_file-1784039234671",
       "type": "custom",
       "position": {
-        "x": 81.5,
-        "y": 76.5
+        "x": -469.9029062148984,
+        "y": -445.7416802154951
+      },
+      "data": {
+        "label": "White Wine Dataset",
+        "templateKey": "data_file",
+        "isPredefined": true,
+        "params": {
+          "type": "data_file",
+          "adapter_type": "dlr_connector",
+          "provider_bpn": "BPNLNWF14QKMQ9QE",
+          "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/jin-conn/cp/protocol",
+          "asset_id": "Wine Quality Dataset for White Wine"
+        },
+        "paramOrder": [
+          "type",
+          "adapter_type",
+          "provider_bpn",
+          "provider_url",
+          "asset_id"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "adapter_type": "string",
+          "provider_bpn": "string",
+          "provider_url": "string",
+          "asset_id": "string"
+        },
+        "paramValidators": {
+          "provider_url": "url"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 1,
+        "outputCount": 2
+      },
+      "measured": {
+        "width": 340,
+        "height": 224
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "data_file-1784039325889",
+      "type": "custom",
+      "position": {
+        "x": -468.2980478643869,
+        "y": 25.84592330206479
+      },
+      "data": {
+        "label": "Red Wine Dataset",
+        "templateKey": "data_file",
+        "isPredefined": true,
+        "params": {
+          "type": "data_file",
+          "adapter_type": "dlr_connector",
+          "provider_bpn": "BPNLNWF14QKMQ9QE",
+          "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/jin-conn/cp/protocol",
+          "asset_id": "Wine Quality Dataset for Red Wine"
+        },
+        "paramOrder": [
+          "type",
+          "adapter_type",
+          "provider_bpn",
+          "provider_url",
+          "asset_id"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "adapter_type": "string",
+          "provider_bpn": "string",
+          "provider_url": "string",
+          "asset_id": "string"
+        },
+        "paramValidators": {
+          "provider_url": "url"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 1,
+        "outputCount": 2
+      },
+      "measured": {
+        "width": 340,
+        "height": 224
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "container_image-1784039489992",
+      "type": "custom",
+      "position": {
+        "x": 494.1147380473126,
+        "y": -18.45031842187308
       },
       "data": {
         "label": "container_image",
@@ -19,9 +115,9 @@
           "asset_id": "1019709d-eeca-4abf-87ec-3d9654ad4e19",
           "representation": "archive",
           "platforms": "linux/amd64",
-          "image_name": "test5",
-          "image_tag": "ver5",
-          "registry_addr": "null"
+          "image_name": "testimage",
+          "image_tag": "latest",
+          "registry_addr": "localhost:5000"
         },
         "paramOrder": [
           "type",
@@ -60,9 +156,171 @@
         "width": 340,
         "height": 355
       },
-      "selected": true,
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "zipper-1784039523119",
+      "type": "custom",
+      "position": {
+        "x": 489.73135034974723,
+        "y": -420.9992439177321
+      },
+      "data": {
+        "label": "zipper",
+        "templateKey": "zipper",
+        "isPredefined": true,
+        "params": {
+          "type": "zipper",
+          "target_directory": "download",
+          "output_path": "download/winedata.zip"
+        },
+        "paramOrder": [
+          "type",
+          "target_directory",
+          "output_path"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "target_directory": "string",
+          "output_path": "string"
+        },
+        "paramValidators": {
+          "target_directory": "path",
+          "output_path": "path"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 1,
+        "outputCount": 1
+      },
+      "measured": {
+        "width": 340,
+        "height": 172
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "save_to_file-1784039608304",
+      "type": "custom",
+      "position": {
+        "x": -10.052728791216282,
+        "y": -324.3501193535026
+      },
+      "data": {
+        "label": "save_to_file",
+        "templateKey": "save_to_file",
+        "isPredefined": true,
+        "params": {
+          "type": "save_to_file",
+          "file_path": "download/whiteWine.csv"
+        },
+        "paramOrder": [
+          "type",
+          "file_path"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "file_path": "string"
+        },
+        "paramValidators": {
+          "file_path": "path"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 2,
+        "outputCount": 1
+      },
+      "measured": {
+        "width": 340,
+        "height": 146
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "save_to_file-1784039633096",
+      "type": "custom",
+      "position": {
+        "x": -11.374462144595725,
+        "y": -18.934880471092285
+      },
+      "data": {
+        "label": "save_to_file",
+        "templateKey": "save_to_file",
+        "isPredefined": true,
+        "params": {
+          "type": "save_to_file",
+          "file_path": "download/RedWine.csv"
+        },
+        "paramOrder": [
+          "type",
+          "file_path"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "file_path": "string"
+        },
+        "paramValidators": {
+          "file_path": "path"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 2,
+        "outputCount": 1
+      },
+      "measured": {
+        "width": 340,
+        "height": 146
+      },
+      "selected": false,
       "dragging": false
     }
   ],
-  "edges": []
+  "edges": [
+    {
+      "source": "data_file-1784039234671",
+      "sourceHandle": "output_0",
+      "target": "save_to_file-1784039608304",
+      "targetHandle": "input_0",
+      "animated": true,
+      "id": "xy-edge__data_file-1784039234671output_0-save_to_file-1784039608304input_0"
+    },
+    {
+      "source": "data_file-1784039325889",
+      "sourceHandle": "output_0",
+      "target": "save_to_file-1784039633096",
+      "targetHandle": "input_0",
+      "animated": true,
+      "id": "xy-edge__data_file-1784039325889output_0-save_to_file-1784039633096input_0"
+    },
+    {
+      "source": "save_to_file-1784039633096",
+      "sourceHandle": "dep",
+      "target": "zipper-1784039523119",
+      "targetHandle": "dep",
+      "animated": true,
+      "id": "xy-edge__save_to_file-1784039633096dep-zipper-1784039523119dep"
+    },
+    {
+      "source": "save_to_file-1784039608304",
+      "sourceHandle": "dep",
+      "target": "zipper-1784039523119",
+      "targetHandle": "dep",
+      "animated": true,
+      "id": "xy-edge__save_to_file-1784039608304dep-zipper-1784039523119dep"
+    },
+    {
+      "source": "save_to_file-1784039633096",
+      "sourceHandle": "dep",
+      "target": "container_image-1784039489992",
+      "targetHandle": "dep",
+      "animated": true,
+      "id": "xy-edge__save_to_file-1784039633096dep-container_image-1784039489992dep"
+    }
+  ]
 }

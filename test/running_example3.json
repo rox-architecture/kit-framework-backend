@@ -15,7 +15,7 @@
           "representation": "Dockerfile",
           "image_name": "mytestpython",
           "image_tag": "test",
-          "type": "data_container",
+          "type": "container_image",
           "platforms": "linux/amd64",
           "adapter_type": "dlr_connector",
           "asset_id": "12504860-6d34-4729-a14f-ca8067ed0a38",

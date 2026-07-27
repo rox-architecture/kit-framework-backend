@@ -13,3 +13,7 @@ class ExecRequestInput(BaseModel):
     """Execution request model."""
 
     workflow_id: str
+
+class ConfigChange(BaseModel):
+    """Configuration request model"""
+    auto_nego: bool | None = None

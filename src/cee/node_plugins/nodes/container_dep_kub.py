@@ -7,6 +7,14 @@ from kubernetes.client.exceptions import ApiException
 class ContainerDeploymentKubernetes(Base):
     """Container Deployment Kubernetes node."""
 
+    # Input is always a list of Items
+    class InputSpec(BaseModel):
+        pass
+
+    # Output is always a list of Items
+    class OutputSpec(BaseModel):
+        pass
+
     class ParamSpec(BaseModel):
         """Container Deployment Kubernetes node param spec."""
 
@@ -29,7 +37,7 @@ class ContainerDeploymentKubernetes(Base):
         super().__init__(node)
 
 
-    def run(self, input_data: dict | None = None) -> None:
+    def run(self, config: dict, input_data: dict | None = None) -> None:
         """Run the ndoe."""
         print(f"[Node {self.node_id}] Execution started")
 

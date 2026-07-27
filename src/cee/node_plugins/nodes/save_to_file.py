@@ -12,6 +12,10 @@ class SaveToFile(Base):
         """Safe to file node input spec."""
         input_0: Item
 
+    # Output is always a list of Items
+    class OutputSpec(BaseModel):
+        pass
+
     class ParamSpec(BaseModel):
         """Safe to file node param spec."""
         file_path: Path
@@ -20,7 +24,7 @@ class SaveToFile(Base):
         """Initialize the instance."""
         super().__init__(node)
 
-    def run(self, input_data: dict | None = None) -> None:
+    def run(self, config: dict, input_data: dict | None = None) -> None:
         print(f"[Node {self.node_id}] Execution started")
         # check input schema
         validated_input = self.InputSpec.model_validate(input_data)

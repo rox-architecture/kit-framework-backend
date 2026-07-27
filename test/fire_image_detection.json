@@ -1,0 +1,393 @@
+{
+  "nodes": [
+    {
+      "id": "ds_static_file-1784764079804",
+      "type": "custom",
+      "position": {
+        "x": -322.49979723327533,
+        "y": 192.49433400592426
+      },
+      "data": {
+        "label": "Fire Detect Model",
+        "templateKey": "ds_static_file",
+        "isPredefined": true,
+        "params": {
+          "type": "ds_static_file",
+          "adapter_type": "dlr_connector",
+          "provider_bpn": "BPNLM67H9AVUVPTD",
+          "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/dlr-rox-conn/cp/protocol",
+          "asset_id": "10a4528d-0ed6-447c-9388-296b20053b69"
+        },
+        "paramOrder": [
+          "type",
+          "adapter_type",
+          "provider_bpn",
+          "provider_url",
+          "asset_id"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "adapter_type": "string",
+          "provider_bpn": "string",
+          "provider_url": "string",
+          "asset_id": "string"
+        },
+        "paramValidators": {
+          "provider_url": "url"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 1,
+        "outputCount": 2
+      },
+      "measured": {
+        "width": 340,
+        "height": 225
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "ds_static_file-1784764084132",
+      "type": "custom",
+      "position": {
+        "x": -320.3888711932656,
+        "y": -180.51265139064475
+      },
+      "data": {
+        "label": "Test Road Images",
+        "templateKey": "ds_static_file",
+        "isPredefined": true,
+        "params": {
+          "type": "ds_static_file",
+          "adapter_type": "dlr_connector",
+          "provider_bpn": "BPNLM67H9AVUVPTD",
+          "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/dlr-rox-conn/cp/protocol",
+          "asset_id": "1764f9c3-56eb-4616-8ae8-bfdea2a5c066"
+        },
+        "paramOrder": [
+          "type",
+          "adapter_type",
+          "provider_bpn",
+          "provider_url",
+          "asset_id"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "adapter_type": "string",
+          "provider_bpn": "string",
+          "provider_url": "string",
+          "asset_id": "string"
+        },
+        "paramValidators": {
+          "provider_url": "url"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 1,
+        "outputCount": 2
+      },
+      "measured": {
+        "width": 340,
+        "height": 225
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "save_to_file-1784764156717",
+      "type": "custom",
+      "position": {
+        "x": 120.3149580131267,
+        "y": 244.54542151306725
+      },
+      "data": {
+        "label": "save_to_file",
+        "templateKey": "save_to_file",
+        "isPredefined": true,
+        "params": {
+          "type": "save_to_file",
+          "file_path": "vision/model/model.onnx"
+        },
+        "paramOrder": [
+          "type",
+          "file_path"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "file_path": "string"
+        },
+        "paramValidators": {
+          "file_path": "path"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 2,
+        "outputCount": 1
+      },
+      "measured": {
+        "width": 340,
+        "height": 146
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "save_to_file-1784764187196",
+      "type": "custom",
+      "position": {
+        "x": 76.55045767566966,
+        "y": -124.59486851956697
+      },
+      "data": {
+        "label": "save_to_file",
+        "templateKey": "save_to_file",
+        "isPredefined": true,
+        "params": {
+          "type": "save_to_file",
+          "file_path": "vision/images.zip"
+        },
+        "paramOrder": [
+          "type",
+          "file_path"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "file_path": "string"
+        },
+        "paramValidators": {
+          "file_path": "path"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 2,
+        "outputCount": 1
+      },
+      "measured": {
+        "width": 340,
+        "height": 146
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "unzipper-1784764258292",
+      "type": "custom",
+      "position": {
+        "x": 489.54665868218524,
+        "y": -132.69979882318262
+      },
+      "data": {
+        "label": "unzipper",
+        "templateKey": "unzipper",
+        "isPredefined": true,
+        "params": {
+          "type": "unzipper",
+          "target_zip": "vision/images.zip",
+          "extract_directory": "vision/input"
+        },
+        "paramOrder": [
+          "type",
+          "target_zip",
+          "extract_directory"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "target_zip": "string",
+          "extract_directory": "string"
+        },
+        "paramValidators": {
+          "target_zip": "path",
+          "extract_directory": "path"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 1,
+        "outputCount": 1
+      },
+      "measured": {
+        "width": 340,
+        "height": 172
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "ds_container-1784764884717",
+      "type": "custom",
+      "position": {
+        "x": -759.1814923771642,
+        "y": -66.25904016825493
+      },
+      "data": {
+        "label": "container_image",
+        "templateKey": "ds_container",
+        "isPredefined": true,
+        "params": {
+          "type": "ds_container",
+          "adapter_type": "dlr_connector",
+          "provider_bpn": "BPNLM67H9AVUVPTD",
+          "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/dlr-rox-conn/cp/protocol",
+          "asset_id": "b66695be-4dcc-4897-af51-f4feafad7efa",
+          "representation": "archive",
+          "platforms": "linux/amd64",
+          "image_name": "yolo-inference-runtime",
+          "image_tag": "latest",
+          "registry_addr": ""
+        },
+        "paramOrder": [
+          "type",
+          "adapter_type",
+          "provider_bpn",
+          "provider_url",
+          "asset_id",
+          "representation",
+          "platforms",
+          "image_name",
+          "image_tag",
+          "registry_addr"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "adapter_type": "string",
+          "provider_bpn": "string",
+          "provider_url": "string",
+          "asset_id": "string",
+          "representation": "string",
+          "platforms": "array",
+          "image_name": "string",
+          "image_tag": "string",
+          "registry_addr": "string"
+        },
+        "paramValidators": {
+          "provider_url": "url"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 1,
+        "outputCount": 1
+      },
+      "measured": {
+        "width": 340,
+        "height": 355
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "docker_command-1784765776119",
+      "type": "custom",
+      "position": {
+        "x": 889.0942770613987,
+        "y": 239.28528732205902
+      },
+      "data": {
+        "label": "docker_command",
+        "templateKey": "docker_command",
+        "isPredefined": true,
+        "params": {
+          "type": "docker_command",
+          "command": [
+            "docker",
+            "run",
+            "--rm",
+            "-v",
+            "vision/model:/data/model:ro",
+            "-v",
+            "vision/input:/data/input:ro",
+            "-v",
+            "vision/output:/data/output",
+            "yolo-inference-runtime:latest"
+          ],
+          "timeout_seconds": null
+        },
+        "paramOrder": [
+          "type",
+          "command",
+          "timeout_seconds"
+        ],
+        "paramTypes": {
+          "type": "string",
+          "command": "array",
+          "timeout_seconds": "number"
+        },
+        "paramValidators": {},
+        "lockedParams": [
+          "type"
+        ],
+        "inputCount": 1,
+        "outputCount": 1
+      },
+      "measured": {
+        "width": 340,
+        "height": 172
+      },
+      "selected": true,
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "source": "ds_static_file-1784764079804",
+      "sourceHandle": "output_0",
+      "target": "save_to_file-1784764156717",
+      "targetHandle": "input_0",
+      "id": "edge-ds_static_file-1784764079804-source:output_0-save_to_file-1784764156717-target:input_0-1784764203485",
+      "animated": true
+    },
+    {
+      "source": "ds_static_file-1784764084132",
+      "sourceHandle": "output_0",
+      "target": "save_to_file-1784764187196",
+      "targetHandle": "input_0",
+      "id": "edge-ds_static_file-1784764084132-source:output_0-save_to_file-1784764187196-target:input_0-1784764206327",
+      "animated": true
+    },
+    {
+      "source": "save_to_file-1784764187196",
+      "sourceHandle": "dep",
+      "target": "unzipper-1784764258292",
+      "targetHandle": "dep",
+      "id": "edge-save_to_file-1784764187196-source:dep-unzipper-1784764258292-target:dep-1784764262412",
+      "animated": true
+    },
+    {
+      "source": "ds_container-1784764884717",
+      "sourceHandle": "dep",
+      "target": "ds_static_file-1784764084132",
+      "targetHandle": "dep",
+      "id": "edge-ds_container-1784764884717-source:dep-ds_static_file-1784764084132-target:dep-1784764889046",
+      "animated": true
+    },
+    {
+      "source": "ds_container-1784764884717",
+      "sourceHandle": "dep",
+      "target": "ds_static_file-1784764079804",
+      "targetHandle": "dep",
+      "id": "edge-ds_container-1784764884717-source:dep-ds_static_file-1784764079804-target:dep-1784764891438",
+      "animated": true
+    },
+    {
+      "source": "unzipper-1784764258292",
+      "sourceHandle": "dep",
+      "target": "docker_command-1784765776119",
+      "targetHandle": "dep",
+      "id": "edge-unzipper-1784764258292-source:dep-docker_command-1784765776119-target:dep-1784765783611",
+      "animated": true
+    },
+    {
+      "source": "save_to_file-1784764156717",
+      "sourceHandle": "dep",
+      "target": "docker_command-1784765776119",
+      "targetHandle": "dep",
+      "id": "edge-save_to_file-1784764156717-source:dep-docker_command-1784765776119-target:dep-1784765786950",
+      "animated": true
+    }
+  ]
+}

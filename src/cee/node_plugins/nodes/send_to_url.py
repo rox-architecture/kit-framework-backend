@@ -8,9 +8,13 @@ import requests
 class SendToUrl(Base):
     """Send binary data to a URL."""
 
+    # Input is always a list of Items
     class InputSpec(BaseModel):
-        """SendToUrl node input spec."""
-        input_0: Item
+        pass
+
+    # Output is always a list of Items
+    class OutputSpec(BaseModel):
+        pass
 
     class ParamSpec(BaseModel):
         """SendToUrl node param spec."""
@@ -24,16 +28,11 @@ class SendToUrl(Base):
         ] = "POST"
         timeout: float = 30.0
 
-    class OutputSpec(BaseModel):
-        """SendToUrl node output spec."""
-        output_0: Item
-
-
     def __init__(self, node: dict[str, Any]) -> None:
         """Initialize the instance."""
         super().__init__(node)
 
-    def run(self, input_data: dict | None = None) -> None:
+    def run(self, config: dict, input_data: dict | None = None) -> None:
         """Run the node."""
         print(f"[Node {self.node_id}] Execution started")
 

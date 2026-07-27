@@ -5,7 +5,16 @@ import requests
 from pydantic import TypeAdapter
 
 from cee.adapters_plugins.adapter import Adapter
-from cee.models.edc import Catalog, Dataset, Edr, EdrDataAddress, NegotiationInitiation
+from cee.models.edc import (
+    AssetCreation,
+    AssetsSelector,
+    Catalog,
+    DataAddress,
+    Dataset,
+    Edr,
+    EdrDataAddress,
+    NegotiationInitiation,
+)
 
 FederatedCatalogAdapter = TypeAdapter(list[Catalog])
 EdrsAdapter = TypeAdapter(list[Edr])
@@ -105,6 +114,22 @@ class TsAdapter(Adapter):
         response = self.session.post(url, json=payload)
         response.raise_for_status()
 
+
+    def create_asset(
+        self, asset_id: str, properties: dict[str, Any], data_address: DataAddress
+    ) -> None:
+        """Create the given asset."""
+        payload = AssetCreation(
+            at_context=EDC_CONTEXT,
+            at_id=asset_id,
+            properties=properties,
+            data_address=data_address
+        ).model_dump(exclude_none=True)
+
+        endpoint = "data/v3/assets"
+        url = f"{self.base_url}/{endpoint}"
+        response = self.session.post(url, json=payload)
+        response.raise_for_status()
 
     def _get_edr_data_address(
         self, edrs: list[Edr], asset_id: str

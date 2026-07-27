@@ -49,6 +49,10 @@ class Base(ABC):
     def get_param_spec(cls):
         """Return the param spec."""
         return cls.ParamSpec.model_fields
+    
+    # @abstractmethod
+    # def get_requirements(self):
+    #     ...
 
     def set_output(self, port: int, item: Item) -> None:
         reference = f'output_{port}'
@@ -66,7 +70,7 @@ class Base(ABC):
         return True
 
     @abstractmethod
-    def run(self, input_data: dict | None = None) -> None:
+    def run(self, config: dict, input_data: dict | None = None) -> None:
         """Run the node."""
         # input_data must match InputSpec
         # params must match ParamSpec

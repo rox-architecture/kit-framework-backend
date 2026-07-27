@@ -5,6 +5,14 @@ import shutil
 
 class Unzipper(Base):
     """Unzipper node."""
+    
+    # Input is always a list of Items
+    class InputSpec(BaseModel):
+        pass
+
+    # Output is always a list of Items
+    class OutputSpec(BaseModel):
+        pass
 
     class ParamSpec(BaseModel):
         """Unzipper node param spec."""
@@ -15,7 +23,7 @@ class Unzipper(Base):
         """Initialize the instance."""
         super().__init__(node)
 
-    def run(self, input_data: dict | None = None) -> None:
+    def run(self, config: dict, input_data: dict | None = None) -> None:
         print(f"[Node {self.node_id}] Execution started")
 
         """Run the node."""

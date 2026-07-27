@@ -11,10 +11,11 @@ from cee.execution_manager import ExecutionManager
 from contextlib import asynccontextmanager
 from cee.schema.api_schema import ExecRequestInput, GraphInput
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
+
 
 execution_manager = ExecutionManager()
 load_dotenv()
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -33,6 +34,16 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 async def root():
@@ -180,7 +191,16 @@ async def cancel_execution(execution_id: str):
 
 
 # --------------------------------------------------------------------
+# Supplementary Endpoints
+# --------------------------------------------------------------------
 
+@app.post("/config")
+async def cancel_execution(config: ConfigChange):
+    configuration = await execution_manager.set_config(config.model_dump(exclude_none=True))
+    return {
+        "message": "Configuration changed",
+        "configuration": configuration
+    }
 
 if __name__ == "__main__":
     uvicorn.run(

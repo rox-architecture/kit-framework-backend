@@ -4,18 +4,18 @@
       "id": "node-1783457340971",
       "type": "custom",
       "position": {
-        "x": -204.24628256974734,
-        "y": 45.597665370291
+        "x": 170.9610102108822,
+        "y": -102.39593039005014
       },
       "data": {
-        "label": "Python3.12_Container",
+        "label": "Py3.12 Container",
         "params": {
           "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/lea-conn/cp/protocol",
           "provider_bpn": "BPNLE56YR9OQVTA3",
           "representation": "Dockerfile",
           "image_name": "mytestpython",
           "image_tag": "test",
-          "type": "data_container",
+          "type": "container_image",
           "platforms": "linux/amd64",
           "adapter_type": "dlr_connector",
           "asset_id": "12504860-6d34-4729-a14f-ca8067ed0a38"
@@ -31,14 +31,27 @@
           "adapter_type",
           "asset_id"
         ],
-        "inputCount": 0,
-        "outputCount": 0
+        "inputCount": 1,
+        "outputCount": 1,
+        "paramTypes": {
+          "provider_url": "string",
+          "provider_bpn": "string",
+          "representation": "string",
+          "image_name": "string",
+          "image_tag": "string",
+          "type": "string",
+          "platforms": "string",
+          "adapter_type": "string",
+          "asset_id": "string"
+        },
+        "paramValidators": {},
+        "lockedParams": []
       },
       "measured": {
-        "width": 511,
+        "width": 340,
         "height": 329
       },
-      "selected": true,
+      "selected": false,
       "dragging": false
     }
   ],
