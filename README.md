@@ -27,7 +27,6 @@ The key benefits of this approach are:
 * **Consolidated dependency analysis**
   Complex systems, such as robotic applications, often depend on multiple hardware and software requirements. A workflow can consolidate the dependencies of all included assets into a single overview, making it easier to detect missing requirements or conflicts.
 
-
 ## System Structure
 
 This repository contains: 

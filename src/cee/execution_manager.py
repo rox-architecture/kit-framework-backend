@@ -20,7 +20,6 @@ from cee.db_handler import (
 )
 from cee.sequence_generator import SequenceGenerator
 
-
 class ExecutionManager:
     """Claim executions and dispatch dependency-ready nodes to Celery."""
 
@@ -163,7 +162,6 @@ class ExecutionManager:
 
     # This is the main loop of the execution manager
     # The schedule db is monitored
->>>>>>> src/cee/execution_manager.py
     async def run(self) -> None:
         """Continuously claim executions and advance ready nodes."""
         while self._running:
