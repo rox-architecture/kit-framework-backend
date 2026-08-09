@@ -1,18 +1,18 @@
 from fastapi import FastAPI, HTTPException, Response
 import uvicorn
-from cee.sequence_generator import SequenceGenerator
-from cee.db_handler import (
+from src.cee.sequence_generator import SequenceGenerator
+from src.cee.db_handler import (
     DbHandlerExecution,
     DbHandlerNodeExecution,
     DbHandlerWorkflow,
     initialize_database,
 )
-from cee.execution_manager import ExecutionManager
+from src.cee.execution_manager import ExecutionManager
 from contextlib import asynccontextmanager
-from cee.schema.api_schema import ExecRequestInput, GraphInput
+from src.cee.schema.api_schema import ExecRequestInput, GraphInput
+from src.cee.schema.db_schema import WorkflowCols
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
-
 
 execution_manager = ExecutionManager()
 load_dotenv()
@@ -87,13 +87,9 @@ async def register_workflow(request: GraphInput):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.get("/workflows/show/all")
-async def get_all_workflow():
-    return {
-        "workflow_ids": [
-            workflow.workflow_id for workflow in DbHandlerWorkflow.get_all()
-        ]
-    }
+@app.get("/workflows/all")
+async def get_all_workflows():
+    return DbHandlerWorkflow.get_all()
 
 
 @app.get("/workflows/{workflow_id}")
@@ -126,7 +122,7 @@ async def delete_workflow(workflow_id: str):
 # --------------------------------------------------------------------
 
 
-@app.get("/execution")
+@app.get("/executions")
 async def get_all_executions():
     db = DbHandlerExecution()
     return {"executions": db.get_all_executions()}
@@ -189,18 +185,6 @@ async def cancel_execution(execution_id: str):
         "execution_id": execution_id,
     }
 
-
-# --------------------------------------------------------------------
-# Supplementary Endpoints
-# --------------------------------------------------------------------
-
-@app.post("/config")
-async def cancel_execution(config: ConfigChange):
-    configuration = await execution_manager.set_config(config.model_dump(exclude_none=True))
-    return {
-        "message": "Configuration changed",
-        "configuration": configuration
-    }
 
 if __name__ == "__main__":
     uvicorn.run(

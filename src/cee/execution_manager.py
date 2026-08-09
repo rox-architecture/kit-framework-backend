@@ -19,6 +19,8 @@ from cee.db_handler import (
     DbHandlerWorkflow,
 )
 from cee.sequence_generator import SequenceGenerator
+from cee.node_plugins.node_registry import NODE_REGISTRY
+
 
 class ExecutionManager:
     """Claim executions and dispatch dependency-ready nodes to Celery."""
@@ -29,17 +31,6 @@ class ExecutionManager:
         self._running = False
         self._cleanup_after: dict[str, float] = {}
         self._running_tasks: dict[str, asyncio.Task] = {}  # for the worker cancellation
-
-        # TODO: add more configuration aspects
-        self.configurations = {
-            "auto_nego": True, # automatically make required negotiations
-            "auto_nego_retry_wait_sec": 5, # wait each negotiation attempt for 5 seconds
-            "auto_nego_retry_count": 3,
-        } 
-
-    async def set_config(self, config_changes):
-        self.configurations.update(config_changes)
-        return self.configurations
 
     async def start(self) -> None:
         """Start the coordinator polling loop."""
@@ -142,7 +133,7 @@ class ExecutionManager:
                         input_data[target_port_ref] = item
 
                     # execute the node in a non-blocking way
-                    await asyncio.to_thread(node_obj.run, self.configurations, input_data)
+                    await asyncio.to_thread(node_obj.run, input_data)
 
 
         except asyncio.CancelledError:

@@ -1,0 +1,6 @@
+services:
+  worker:
+    environment:
+      KUBECONFIG: /kube/config
+    volumes:
+      - ${KUBECONFIG_HOST_PATH}:/kube/config:ro

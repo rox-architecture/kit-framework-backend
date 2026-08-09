@@ -2,7 +2,7 @@ from typing import Any
 
 from pydantic import BaseModel, HttpUrl
 
-from cee.adapters_plugins.adapter_registry import ADAPTER_REGISTRY
+from cee.node_plugins.dlr_dataspace.dlr_adapter import DlrAdapter
 from cee.node_plugins.base import Base
 from cee.schema.execution_schema import Item
 
@@ -14,7 +14,6 @@ class ServiceFile(Base):
     class InputSpec(BaseModel):
         """Service file node input spec."""
 
-        adapter_type: str
         provider_bpn: str
         provider_url: HttpUrl
         asset_id: str
@@ -32,8 +31,7 @@ class ServiceFile(Base):
         """Initialize the instance."""
         super().__init__(node)
 
-        adapter_type = self.params["adapter_type"]
-        self.adapter = ADAPTER_REGISTRY[adapter_type]()
+        self.adapter = DlrAdapter()
 
     def check_validty(self) -> bool:
         """Check whether the node is valid."""
@@ -42,7 +40,7 @@ class ServiceFile(Base):
 
     # Implement DataFile node behaviour
     # the outputs are stored in `self.outputs` and retrieved via the Get method
-    def run(self, config: dict, input_data: dict | None = None) -> None:
+    def run(self, input_data: dict | None = None) -> None:
         """Run the ndoe."""
         print(f"[Node {self.node_id}] Execution started")
 
@@ -59,15 +57,7 @@ class ServiceFile(Base):
                 asset_id, method=method, subpath=subpath, payload=payload
             )
         except Exception:
-            if config['auto_nego']: 
-                print("automatic negotiation is triggered")
-                ack = self.adapter.initiate_negotiation(
-                    provider_bpn, provider_url, asset_id
-                )
-                response = self.adapter.transfer_data_pull(asset_id)
-            else:
-                raise PermissionError("Negotiation required and auto-nego is disabled")
-            
+            raise PermissionError("Negotiation required")
             
         data = Item(
             json_data={

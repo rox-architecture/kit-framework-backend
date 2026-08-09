@@ -5,7 +5,7 @@ from typing import Any
 import requests
 from pydantic import TypeAdapter
 
-from cee.adapters_plugins.adapter import Adapter
+from cee.node_plugins.adapter import Adapter
 from cee.models.edc import (
     AssetCreation,
     AssetsSelector,

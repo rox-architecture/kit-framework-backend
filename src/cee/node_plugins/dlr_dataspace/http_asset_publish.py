@@ -2,7 +2,7 @@ from pydantic import BaseModel, HttpUrl
 from typing import Literal, Any
 from cee.schema.execution_schema import Item
 from cee.node_plugins.base import Base
-from cee.adapters_plugins.adapter_registry import ADAPTER_REGISTRY
+from cee.node_plugins.dlr_dataspace.dlr_adapter import DlrAdapter
 from cee.models.edc import HttpDataAddress
 
 
@@ -19,7 +19,6 @@ class HttpAssetPublish(Base):
 
     class ParamSpec(BaseModel):
         """Asset Publish node param spec."""
-        adapter_type: str
         asset_id: str
         properties: dict[str, Any]
         data_address: HttpDataAddress
@@ -29,11 +28,10 @@ class HttpAssetPublish(Base):
         super().__init__(node)
 
         # select the correct adapter based on the parameter value
-        adapter_type = self.params["adapter_type"]
-        self.adapter = ADAPTER_REGISTRY[adapter_type]()
+        self.adapter = DlrAdapter()
 
 
-    def run(self, config: dict, input_data: dict | None = None) -> None:
+    def run(self, input_data: dict | None = None) -> None:
         """Run the ndoe."""
         print(f"[Node {self.node_id}] Execution started")
 

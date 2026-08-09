@@ -1,9 +1,7 @@
 import subprocess
 from pathlib import Path
 from typing import Any
-
 from pydantic import BaseModel, Field
-
 from cee.node_plugins.base import Base
 
 
@@ -148,7 +146,6 @@ class DockerCommand(Base):
 
     def run(
         self,
-        config: dict,
         input_data: dict | None = None,
     ) -> None:
         """Execute the configured Docker command."""

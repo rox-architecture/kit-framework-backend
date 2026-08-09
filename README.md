@@ -136,6 +136,16 @@ First run the database needed for the executione engine.
 docker compose up --build -d
 ```
 
+For those with Kubernetes environment, you can also enable the kubernetes deployment.
+```bash
+export KUBECONFIG_HOST_PATH="$HOME/.kube/config"
+
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.kubernetes.yml \
+  up -d
+```
+
 Then run the execution engine (you need the .venv activated)
 
 Node inputs and outputs are exchanged through the `execution_artifacts` Docker

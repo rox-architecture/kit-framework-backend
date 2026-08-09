@@ -2,7 +2,7 @@ from typing import Any
 from pydantic import BaseModel
 from cee.schema.execution_schema import Item
 from cee.node_plugins.base import Base
-
+from cee.node_plugins.dlr_dataspace.dlr_adapter import DlrAdapter
 
 class ServiceStream(Base):
     """Service stream node."""
@@ -20,6 +20,6 @@ class ServiceStream(Base):
         """Initialize the instance."""
         super().__init__(node)
 
-    def run(self, config: dict, input_data: dict | None = None) -> None:
+    def run(self, input_data: dict | None = None) -> None:
         """Run the node."""
         print("ServiceStream object triggered")

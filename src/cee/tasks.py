@@ -26,6 +26,9 @@ def execute_node(
     try:
         input_data: dict[str, Item] = {}
         for edge in ingress_edges:
+            if edge["sourceHandle"] == "dep" and edge["targetHandle"] == "dep":
+                continue
+
             reference = store.reference(
                 execution_id, str(edge["source"]), str(edge["sourceHandle"])
             )

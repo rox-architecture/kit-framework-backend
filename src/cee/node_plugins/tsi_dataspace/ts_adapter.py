@@ -4,7 +4,7 @@ from functools import lru_cache
 import requests
 from pydantic import TypeAdapter
 
-from cee.adapters_plugins.adapter import Adapter
+from cee.node_plugins.adapter import Adapter
 from cee.models.edc import (
     AssetCreation,
     AssetsSelector,

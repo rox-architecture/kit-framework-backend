@@ -3,7 +3,7 @@ from typing import Literal, Any
 from cee.schema.execution_schema import Item
 from cee.node_plugins.base import Base
 import time
-from cee.adapters_plugins.adapter_registry import ADAPTER_REGISTRY
+from cee.node_plugins.dlr_dataspace.dlr_adapter import DlrAdapter
 
 
 class StaticFile(Base):
@@ -19,7 +19,6 @@ class StaticFile(Base):
 
     class ParamSpec(BaseModel):
         """Data file node param spec."""
-        adapter_type: str
         provider_bpn: str
         provider_url: HttpUrl
         asset_id: str
@@ -30,8 +29,7 @@ class StaticFile(Base):
         super().__init__(node)
 
         # select the correct adapter based on the parameter value
-        adapter_type = self.params["adapter_type"]
-        self.adapter = ADAPTER_REGISTRY[adapter_type]()
+        self.adapter = DlrAdapter()
 
     def check_validty(self) -> bool:
         """Check whether the node is valid."""
@@ -40,7 +38,7 @@ class StaticFile(Base):
 
     # Implement DataFile node behaviour
     # the outputs are stored in `self.outputs` and retrieved via the Get method
-    def run(self, config: dict, input_data: dict | None = None) -> None:
+    def run(self, input_data: dict | None = None) -> None:
         """Run the ndoe."""
         print(f"[Node {self.node_id}] Execution started")
 
@@ -48,17 +46,12 @@ class StaticFile(Base):
         provider_bpn = self.params['provider_bpn']
         provider_url = self.params['provider_url']
         asset_id = self.params['asset_id']
-        
+
         try:
             response = self.adapter.transfer_data_pull(asset_id)
         except Exception:
-            if config['auto_nego']:
-                print("automatic negotiation is triggered")
-                ack = self.adapter.initiate_negotiation(provider_bpn, provider_url, asset_id)
-                response = self.adapter.transfer_data_pull(asset_id)
-            else:
-                raise PermissionError("Negotiation required and auto-nego is disabled")
-        
+            raise PermissionError("Negotiation required")
+      
         # check against the OutputSpec schema and save into a dict
         data = Item(
             json_data={

@@ -4,40 +4,45 @@
       "id": "node-1783344464430",
       "type": "custom",
       "position": {
-        "x": -223.91020433972778,
-        "y": -199.648967652373
+        "x": -102.0331254782705,
+        "y": -202.26061934226135
       },
       "data": {
         "label": "White Wine Dataset",
         "params": {
-          "type": "ds_static_file",
-          "adapter_type": "dlr_connector",
-          "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/jin-conn/cp/protocol",
+          "type": "static_file",
+          "which_dataspace": "dlr",
           "provider_bpn": "BPNLNWF14QKMQ9QE",
+          "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/jin-conn/cp/protocol",
           "asset_id": "Wine Quality Dataset for White Wine"
         },
         "paramOrder": [
           "type",
-          "adapter_type",
-          "provider_url",
+          "which_dataspace",
           "provider_bpn",
+          "provider_url",
           "asset_id"
         ],
         "inputCount": 1,
         "outputCount": 2,
         "paramTypes": {
           "type": "string",
-          "adapter_type": "string",
-          "provider_url": "string",
+          "which_dataspace": "string",
           "provider_bpn": "string",
+          "provider_url": "string",
           "asset_id": "string"
         },
-        "paramValidators": {},
-        "lockedParams": []
+        "paramValidators": {
+          "provider_url": "url"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "templateKey": "static_file"
       },
       "measured": {
-        "width": 340,
-        "height": 225
+        "width": 180,
+        "height": 110
       },
       "selected": false,
       "dragging": false
@@ -46,8 +51,8 @@
       "id": "node-1783344667589",
       "type": "custom",
       "position": {
-        "x": 299.21125704152934,
-        "y": -93.46589906291105
+        "x": 190.39243662951392,
+        "y": -158.7571913101203
       },
       "data": {
         "label": "Save To File",
@@ -65,12 +70,17 @@
           "type": "string",
           "file_path": "string"
         },
-        "paramValidators": {},
-        "lockedParams": []
+        "paramValidators": {
+          "file_path": "path"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "templateKey": "save_to_file"
       },
       "measured": {
-        "width": 340,
-        "height": 147
+        "width": 180,
+        "height": 110
       },
       "selected": false,
       "dragging": false
@@ -79,40 +89,45 @@
       "id": "node-1783368885402",
       "type": "custom",
       "position": {
-        "x": -225.56932555412482,
-        "y": 170.88114458317875
+        "x": -104.56279725596364,
+        "y": 148.24682993747953
       },
       "data": {
         "label": "Red Wine Dataset",
         "params": {
-          "type": "ds_static_file",
-          "adapter_type": "dlr_connector",
-          "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/jin-conn/cp/protocol",
+          "type": "static_file",
+          "which_dataspace": "dlr",
           "provider_bpn": "BPNLNWF14QKMQ9QE",
+          "provider_url": "https://vision-x-api.base-x-ecosystem.org/connectors/jin-conn/cp/protocol",
           "asset_id": "Wine Quality Dataset for Red Wine"
         },
         "paramOrder": [
           "type",
-          "adapter_type",
-          "provider_url",
+          "which_dataspace",
           "provider_bpn",
+          "provider_url",
           "asset_id"
         ],
         "inputCount": 1,
         "outputCount": 2,
         "paramTypes": {
           "type": "string",
-          "adapter_type": "string",
-          "provider_url": "string",
+          "which_dataspace": "string",
           "provider_bpn": "string",
+          "provider_url": "string",
           "asset_id": "string"
         },
-        "paramValidators": {},
-        "lockedParams": []
+        "paramValidators": {
+          "provider_url": "url"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "templateKey": "static_file"
       },
       "measured": {
-        "width": 340,
-        "height": 225
+        "width": 180,
+        "height": 110
       },
       "selected": false,
       "dragging": false
@@ -121,8 +136,8 @@
       "id": "node-1783369036602",
       "type": "custom",
       "position": {
-        "x": 294.3362704756523,
-        "y": 153.98148369191532
+        "x": 198.57570851307878,
+        "y": 111.32450609040527
       },
       "data": {
         "label": "Save To File",
@@ -140,12 +155,17 @@
           "type": "string",
           "file_path": "string"
         },
-        "paramValidators": {},
-        "lockedParams": []
+        "paramValidators": {
+          "file_path": "path"
+        },
+        "lockedParams": [
+          "type"
+        ],
+        "templateKey": "save_to_file"
       },
       "measured": {
-        "width": 340,
-        "height": 147
+        "width": 180,
+        "height": 110
       },
       "selected": false,
       "dragging": false
@@ -154,8 +174,8 @@
       "id": "zipper-1784275276961",
       "type": "custom",
       "position": {
-        "x": 776.4343541483232,
-        "y": 12.941094630340956
+        "x": 504.8225783999327,
+        "y": -38.42138860413033
       },
       "data": {
         "label": "zipper",
@@ -187,8 +207,8 @@
         "outputCount": 1
       },
       "measured": {
-        "width": 340,
-        "height": 173
+        "width": 180,
+        "height": 110
       },
       "selected": false,
       "dragging": false

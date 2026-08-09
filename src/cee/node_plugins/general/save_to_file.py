@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from cee.schema.execution_schema import Item
 from pathlib import Path
 from cee.node_plugins.base import Base
-
+import os
 
 class SaveToFile(Base):
     """Save to file node."""
@@ -24,20 +24,27 @@ class SaveToFile(Base):
         """Initialize the instance."""
         super().__init__(node)
 
-    def run(self, config: dict, input_data: dict | None = None) -> None:
+    def run(self, input_data: dict | None = None) -> None:
         print(f"[Node {self.node_id}] Execution started")
-        # check input schema
-        validated_input = self.InputSpec.model_validate(input_data)
 
-        # obtain the binary raw data to save into a file
+        validated_input = self.InputSpec.model_validate(input_data)
         binary = validated_input.input_0.binary
 
-        # get the target file path including the file name
-        file_path = self.params['file_path']
-        
-        # create directories if they don't exist
-        file_path.parent.mkdir(parents=True, exist_ok=True)
+        artifact_root = Path(
+            os.environ.get("ARTIFACT_ROOT", "/artifacts")
+        ).resolve()
 
-        # write to a file
-        with open(file_path, 'wb') as f:
-            f.write(binary)
+        requested_path = Path(self.params["file_path"])
+
+        if requested_path.is_absolute():
+            raise ValueError("file_path must be relative to ARTIFACT_ROOT")
+
+        file_path = (artifact_root / requested_path).resolve()
+
+        if not file_path.is_relative_to(artifact_root):
+            raise ValueError("file_path must remain inside ARTIFACT_ROOT")
+
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.write_bytes(binary)
+
+        print(f"[Node {self.node_id}] Saved file to {file_path}", flush=True)
