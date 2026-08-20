@@ -14,6 +14,7 @@ __pycache__/
 
 test/
 docs/
+db/
 
 # C extensions
 *.so

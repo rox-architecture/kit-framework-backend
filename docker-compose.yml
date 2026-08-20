@@ -1,3 +1,5 @@
+name: kit-backend
+
 x-app-environment: &app-environment
   DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://admin:admin@db:5432/workflowdb}
   CELERY_BROKER_URL: ${CELERY_BROKER_URL:-redis://redis:6379/0}
@@ -13,6 +15,7 @@ x-app-environment: &app-environment
 
 x-app-base: &app-base
   build: .
+  image: kit-backend:1.0.0
   environment: *app-environment
   depends_on:
     db:
@@ -26,7 +29,7 @@ x-app-base: &app-base
 services:
   api:
     <<: *app-base
-    container_name: canvas-execution-api
+    container_name: kit-backend-api
     ports:
       - "8080:8080"
     healthcheck:
@@ -50,7 +53,7 @@ services:
 
   db:
     image: postgres:16
-    container_name: canvas-execution-db
+    container_name: kit-backend-db
     environment:
       POSTGRES_DB: workflowdb
       POSTGRES_USER: admin
@@ -67,7 +70,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: canvas-execution-redis
+    container_name: kit-backend-redis
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
