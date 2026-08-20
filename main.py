@@ -87,7 +87,7 @@ async def register_workflow(request: GraphInput):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.get("/workflows/all")
+@app.get("/workflows/all", response_model=list[WorkflowCols])
 async def get_all_workflows():
     return DbHandlerWorkflow.get_all()
 
@@ -122,7 +122,7 @@ async def delete_workflow(workflow_id: str):
 # --------------------------------------------------------------------
 
 
-@app.get("/executions")
+@app.get("/execution")
 async def get_all_executions():
     db = DbHandlerExecution()
     return {"executions": db.get_all_executions()}
