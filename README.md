@@ -1,8 +1,6 @@
 # KIT framework backend
 
-## Run
-
-First run the database needed for the executione engine.
+## Run 
 
 ```bash
 docker compose up --build -d
@@ -17,7 +15,6 @@ docker compose \
   -f docker-compose.kubernetes.yml \
   up -d
 ```
-
 Then run the execution engine (you need the .venv activated)
 
 Node inputs and outputs are exchanged through the `execution_artifacts` Docker
@@ -26,19 +23,31 @@ The worker mounts `/var/run/docker.sock` for Docker-backed node types. Remove
 that mount if those nodes are not used; access to the Docker socket grants the
 worker host-level Docker privileges.
 
-Alternatively using `uv`, 
+## Accessing DB Console
 
-```bash
-uv run python main.py
+```
+psql -U postgres -d workflowdb
 ```
 
-In another terminal, run the GUI:
+In the container:
 ```
-cd react-flow/react-flow-editor
-npm run dev
+docker exec -it canvas-execution-db psql -U admin -d workflowdb
 ```
 
-### Development: Code Quality (Optional)
+### Checking DB
+
+To see the tables
+```
+\dt
+```
+
+To see the contents
+```
+SELECT * FROM workflows;
+```
+
+
+## Development: Code Quality (Optional)
 
 Run `ruff` for formatting and linting via
 
