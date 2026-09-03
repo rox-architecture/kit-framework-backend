@@ -13,6 +13,8 @@ from src.cee.schema.api_schema import ExecRequestInput, GraphInput
 from src.cee.schema.db_schema import WorkflowCols
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
+from src.cee.docker_logs import router as docker_logs_router
+
 
 execution_manager = ExecutionManager()
 load_dotenv()
@@ -33,12 +35,15 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+app.include_router(docker_logs_router)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
+        "http://localhost:5173", # for dev
+        "http://127.0.0.1:5173", # for dev
+        "http://localhost:8088",
+        "http://127.0.0.1:8088",
     ],
     allow_credentials=True,
     allow_methods=["*"],

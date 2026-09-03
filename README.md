@@ -1,5 +1,13 @@
 # KIT framework backend
 
+The backend is responsible for executing a KIT. 
+Executing a KIT means that accessing all the specified dataspace assets in the KIT and placing them at the right location (e.g., directory, registry).
+
+- `backend-api` handles the user requests via API
+- One or more `backend-worker` instances handle tasks concurrently on multiple machines or one machine
+- `backend-db` stores KITs and record the execution history
+- `backend-redis` handles messaging between api and workers
+
 ## Run 
 
 ```bash
@@ -23,7 +31,7 @@ The worker mounts `/var/run/docker.sock` for Docker-backed node types. Remove
 that mount if those nodes are not used; access to the Docker socket grants the
 worker host-level Docker privileges.
 
-## Accessing DB Console
+### Accessing DB Console
 
 ```
 psql -U postgres -d workflowdb
