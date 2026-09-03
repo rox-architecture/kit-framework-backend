@@ -8,6 +8,15 @@ Executing a KIT means that accessing all the specified dataspace assets in the K
 - `backend-db` stores KITs and record the execution history
 - `backend-redis` handles messaging between api and workers
 
+## Update Logs:
+- Version 1.1
+  - Endpoint added `/system/logs/{container}/stream`. It streams the docker logs value from Docker daemon to see the status of the backend-api and workers containers. The value of `{container}` can be:
+    - "api"
+    - "worker-1"
+    - "worker-2"
+    - "worker-3"
+    - "worker-4"
+
 ## Run 
 
 ```bash
