@@ -9,6 +9,10 @@ Executing a KIT means that accessing all the specified dataspace assets in the K
 - `backend-redis` handles messaging between api and workers
 
 ## Update Logs:
+- Version 1.2
+  - Docker command node is removed
+  - Bash command node is created
+    - Bash command input in a single `String` value
 - Version 1.1
   - Endpoint added `/system/logs/{container}/stream`. It streams the docker logs value from Docker daemon to see the status of the backend-api and workers containers. The value of `{container}` can be:
     - "api"
@@ -16,6 +20,7 @@ Executing a KIT means that accessing all the specified dataspace assets in the K
     - "worker-2"
     - "worker-3"
     - "worker-4"
+  - Bug fixed with CORS not accepting the port 8088
 
 ## Run 
 

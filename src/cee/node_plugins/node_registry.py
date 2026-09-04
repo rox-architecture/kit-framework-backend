@@ -13,7 +13,7 @@ from cee.node_plugins.general.save_to_file import SaveToFile
 
 # Deployment nodes
 from cee.node_plugins.deployment.container_dep_kub import ContainerDeploymentKubernetes
-from cee.node_plugins.deployment.docker_command import DockerCommand
+from cee.node_plugins.general.bash_command import BashCommand
 
 NODE_REGISTRY = {
     # General
@@ -21,6 +21,7 @@ NODE_REGISTRY = {
     "zipper": Zipper,
     "unzipper": Unzipper,
     "send_to_url": SendToUrl,
+    "bash_command": BashCommand,
 
     # DLR Dataspace
     "dlr.static_file": StaticFileDLR,
@@ -32,7 +33,6 @@ NODE_REGISTRY = {
 
     # Deployment
     "container_deployment_kubernetes": ContainerDeploymentKubernetes,
-    "docker_command": DockerCommand,
 
     # TSI dataspace
     #TODO more...
